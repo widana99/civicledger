@@ -18,6 +18,8 @@ export async function exportToExcel(reports: Report[], filename?: string) {
     'Alamat': r.address,
     'Latitude': r.latitude || '-',
     'Longitude': r.longitude || '-',
+    'Batas Waktu SLA': r.sla_deadline ? new Date(r.sla_deadline).toLocaleString('id-ID') : '-',
+    'Kondisi SLA': r.sla_deadline && r.status !== 'completed' && r.status !== 'rejected' && new Date(r.sla_deadline).getTime() < new Date().getTime() ? 'OVERDUE' : 'ON-TIME / NORMAL',
     'Tanggal Dibuat': new Date(r.created_at).toLocaleString('id-ID'),
     'Tanggal Update': new Date(r.updated_at).toLocaleString('id-ID'),
     'Tanggal Selesai': r.completed_at ? new Date(r.completed_at).toLocaleString('id-ID') : '-',

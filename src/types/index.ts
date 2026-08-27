@@ -57,6 +57,7 @@ export interface Report {
   completed_at: string | null;
   rejected_reason: string | null;
   is_anonymous?: boolean;
+  sla_deadline?: string | null;
   estimated_completion_at?: string | null;
   created_at: string;
   updated_at: string;
