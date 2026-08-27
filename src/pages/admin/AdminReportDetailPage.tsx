@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { sendReportStatusEmail } from '../../lib/emailService';
+import { MediaGallery } from '../../components/report/MediaGallery';
 
 export function AdminReportDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -557,7 +558,7 @@ export function AdminReportDetailPage() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* LEFT COLUMN: Report Details, Map, Proofs, Audit Logs (2 spans) */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Deskripsi & Foto */}
+          {/* Deskripsi & Multi-Media Bukti Pelapor */}
           <div className="card p-5 space-y-4">
             <h2 className="font-display font-bold text-base text-[#16233D] border-b border-[#E2E4E0] pb-2">
               Detail Isi Laporan Warga
@@ -566,19 +567,15 @@ export function AdminReportDetailPage() {
               {report.description}
             </p>
 
-            {report.photo_url && (
-              <div className="pt-2">
-                <span className="text-xs font-semibold text-[#5A6372] mb-1.5 block">Foto Kondisi Awal di Lapangan:</span>
-                <div className="rounded-[4px] overflow-hidden border border-[#E2E4E0] bg-[#16233D]/5 max-h-96">
-                  <img
-                    src={report.photo_url}
-                    alt="Foto Laporan"
-                    className="w-full h-auto object-contain max-h-96 hover:scale-102 transition-transform cursor-pointer"
-                    onClick={() => report.photo_url && window.open(report.photo_url, '_blank')}
-                  />
-                </div>
-              </div>
-            )}
+            <div className="pt-2">
+              <MediaGallery
+                photoUrls={report.photo_urls}
+                photoUrl={report.photo_url}
+                videoUrl={report.video_url}
+                title="Dokumentasi Laporan Awal Warga"
+                badgeLabel="Laporan Warga"
+              />
+            </div>
           </div>
 
           {/* Lokasi & Peta */}
@@ -631,24 +628,33 @@ export function AdminReportDetailPage() {
 
           {/* Bukti Penyelesaian Petugas (Jika Selesai) */}
           {proofs.length > 0 && (
-            <div className="card p-5 border-l-4 border-l-[#2E8B7F] space-y-3">
-              <h2 className="font-display font-bold text-base text-[#16233D] flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-[#2E8B7F]" />
-                Bukti Foto Hasil Penanganan Lapangan
-              </h2>
-              <div className="grid sm:grid-cols-2 gap-4 pt-1">
+            <div className="card p-5 border-l-4 border-l-[#2E8B7F] space-y-4 bg-gradient-to-b from-emerald-50/20 to-white">
+              <div className="flex items-center justify-between pb-2 border-b border-emerald-100">
+                <h2 className="font-display font-bold text-base text-[#16233D] flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-[#2E8B7F]" />
+                  Bukti Pengerjaan Tuntas Petugas Lapangan
+                </h2>
+                <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                  {proofs.length} Bukti Tercatat
+                </span>
+              </div>
+
+              <div className="space-y-4">
                 {proofs.map((proof) => (
-                  <div key={proof.id} className="border border-[#E2E4E0] rounded-[4px] overflow-hidden bg-[#F8F9FA]">
-                    <img
-                      src={proof.photo_url}
-                      alt="Bukti Selesai"
-                      className="w-full h-48 object-cover cursor-pointer hover:opacity-90"
-                      onClick={() => window.open(proof.photo_url, '_blank')}
+                  <div key={proof.id} className="space-y-3">
+                    <MediaGallery
+                      photoUrls={proof.photo_urls}
+                      photoUrl={proof.photo_url}
+                      videoUrl={proof.video_url}
+                      title={`Bukti Kerja (${formatDateTime(proof.created_at)})`}
+                      badgeLabel="Tuntas"
                     />
-                    <div className="p-2.5 text-xs text-[#16233D]">
-                      <p className="font-medium">{proof.note || 'Tugas selesai ditangani sesuai SOP'}</p>
-                      <p className="text-[10px] text-[#8891A0] mt-1 font-mono">{formatDateTime(proof.created_at)}</p>
-                    </div>
+                    {proof.note && (
+                      <div className="p-3 text-xs text-[#16233D] bg-emerald-50/60 border border-emerald-200 rounded-xl font-medium">
+                        <span className="font-bold text-emerald-900 block mb-0.5">Catatan Petugas Lapangan:</span>
+                        "{proof.note}"
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

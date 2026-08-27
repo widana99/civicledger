@@ -12,6 +12,7 @@ import {
   ChevronRight, ArrowRight, UserCheck, Check, Clock
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
+import { MediaGallery } from './MediaGallery';
 
 interface PublicReportViewProps {
   report: Report;
@@ -280,20 +281,31 @@ export function PublicReportView({
         </div>
       )}
 
-      {/* ───── TRANSPARENCY PROOF: BEFORE & AFTER COMPARISON (IF COMPLETED) ───── */}
+      {/* ───── CITIZEN INITIAL REPORT MEDIA (PHOTOS & VIDEO) ───── */}
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-4">
+        <MediaGallery
+          photoUrls={report.photo_urls}
+          photoUrl={report.photo_url}
+          videoUrl={report.video_url}
+          title="Dokumentasi Laporan Awal Warga"
+          badgeLabel="Kondisi Lapangan"
+        />
+      </div>
+
+      {/* ───── BEFORE & AFTER COMPARISON (OFFICER COMPLETION PROOFS) ───── */}
       {proofs.length > 0 && (
-        <div className="bg-white rounded-3xl border-2 border-emerald-500/30 overflow-hidden shadow-lg p-6 space-y-4">
-          <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-700 flex items-center justify-center">
+        <div className="bg-white rounded-3xl border border-emerald-300 p-6 sm:p-8 shadow-xs space-y-5 bg-gradient-to-b from-emerald-50/20 to-white">
+          <div className="flex items-center justify-between pb-3 border-b border-emerald-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
                 <h3 className="font-display font-extrabold text-base text-slate-900">
-                  Dokumentasi Hasil Pengerjaan Lapangan
+                  Dokumentasi Bukti Pengerjaan Tuntas
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Transparansi bukti penanganan resmi oleh dinas dan petugas
+                  Transparansi bukti penanganan resmi oleh dinas dan petugas lapangan
                 </p>
               </div>
             </div>
@@ -302,60 +314,25 @@ export function PublicReportView({
             </span>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            {/* Before */}
-            {report.photo_url && (
-              <div className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50">
-                <div className="p-3 bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-between">
-                  <span>[ SEBELUM ] Kondisi Awal Laporan</span>
-                  <span className="text-[10px] font-mono text-slate-400">Dari Pelapor</span>
-                </div>
-                <img
-                  src={report.photo_url}
-                  alt="Kondisi Awal"
-                  className="w-full h-52 object-cover cursor-pointer hover:opacity-95 transition-opacity"
-                  onClick={() => report.photo_url && window.open(report.photo_url, '_blank')}
-                />
-              </div>
-            )}
-
-            {/* After */}
+          <div className="space-y-4">
             {proofs.map((proof) => (
-              <div key={proof.id} className="rounded-2xl border border-emerald-300 overflow-hidden bg-emerald-50/30">
-                <div className="p-3 bg-emerald-100/70 border-b border-emerald-200 text-xs font-bold text-emerald-900 flex items-center justify-between">
-                  <span>[ SESUDAH ] Hasil Pengerjaan Selesai</span>
-                  <span className="text-[10px] font-mono text-emerald-700">{formatDateTime(proof.created_at)}</span>
-                </div>
-                <img
-                  src={proof.photo_url}
-                  alt="Bukti Selesai"
-                  className="w-full h-52 object-cover cursor-pointer hover:opacity-95 transition-opacity"
-                  onClick={() => window.open(proof.photo_url, '_blank')}
+              <div key={proof.id} className="space-y-3">
+                <MediaGallery
+                  photoUrls={proof.photo_urls}
+                  photoUrl={proof.photo_url}
+                  videoUrl={proof.video_url}
+                  title={`Bukti Resmi Petugas (${formatDateTime(proof.created_at)})`}
+                  badgeLabel="Tuntas"
                 />
                 {proof.note && (
-                  <div className="p-3 text-xs text-slate-700 bg-white border-t border-emerald-100 font-medium">
+                  <div className="p-3.5 text-xs text-slate-700 bg-emerald-50/50 border border-emerald-200 rounded-xl font-medium">
+                    <span className="font-bold text-emerald-900 block mb-0.5">Catatan Petugas Lapangan:</span>
                     "{proof.note}"
                   </div>
                 )}
               </div>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* Citizen Photo (if not completed or no proof yet) */}
-      {report.photo_url && proofs.length === 0 && (
-        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
-          <div className="p-4 bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-800 flex items-center justify-between">
-            <span>Foto Kondisi Fasilitas Lapangan</span>
-            <span className="text-[10px] font-mono text-slate-400">Dokumentasi Pelapor</span>
-          </div>
-          <img
-            src={report.photo_url}
-            alt={report.title}
-            className="w-full max-h-96 object-cover cursor-pointer hover:opacity-95 transition-opacity"
-            onClick={() => report.photo_url && window.open(report.photo_url, '_blank')}
-          />
         </div>
       )}
 

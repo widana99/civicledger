@@ -49,6 +49,10 @@ export interface Report {
   latitude: number | null;
   longitude: number | null;
   photo_url: string | null;
+  photo_urls?: string[];
+  video_url?: string | null;
+  completion_photo_urls?: string[];
+  completion_video_url?: string | null;
   reporter_id: string;
   wilayah_id: string | null;
   assigned_petugas_id: string | null;
@@ -77,6 +81,8 @@ export interface CompletionProof {
   id: string;
   report_id: string;
   photo_url: string;
+  photo_urls?: string[];
+  video_url?: string | null;
   note: string | null;
   uploaded_by: string;
   created_at: string;

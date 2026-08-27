@@ -13,7 +13,7 @@ import { validateSafeInput, validateFileUpload, rateLimiter, sanitizeString, san
 import {
   Camera, MapPin, Loader2, AlertCircle, CheckCircle2, X,
   FileText, Tag, Layers, AlertTriangle, ThumbsUp, ArrowRight,
-  Shield, Clock,
+  Shield, Clock, Film, Video, Trash2, Plus, Play
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 
@@ -37,8 +37,10 @@ export function CreateReportPage() {
   const [priority, setPriority] = useState<ReportPriority>('medium');
   const [address, setAddress] = useState('');
   const [position, setPosition] = useState<[number, number] | null>(null);
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [video, setVideo] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [wilayahs, setWilayahs] = useState<{ id: string; name: string }[]>([]);
   const [wilayahId, setWilayahId] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -62,15 +64,58 @@ export function CreateReportPage() {
   };
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      setError('File harus berupa gambar');
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    if (photos.length + files.length > 5) {
+      setError('Maksimal 5 foto per laporan');
+      addToast('warning', 'Maksimal 5 foto bukti per laporan');
       return;
     }
-    const compressed = await compressImage(file);
-    setPhoto(compressed);
-    setPhotoPreview(URL.createObjectURL(compressed));
+
+    const newPhotos: File[] = [];
+    const newPreviews: string[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const validation = await validateFileUpload(file);
+      if (!validation.valid) {
+        setError(validation.error || 'File foto tidak valid');
+        addToast('error', validation.error || 'File foto tidak valid');
+        continue;
+      }
+      const compressed = await compressImage(file);
+      newPhotos.push(compressed);
+      newPreviews.push(URL.createObjectURL(compressed));
+    }
+
+    setPhotos((prev) => [...prev, ...newPhotos]);
+    setPhotoPreviews((prev) => [...prev, ...newPreviews]);
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+    setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleVideoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validation = await validateFileUpload(file);
+    if (!validation.valid) {
+      setError(validation.error || 'File video tidak valid');
+      addToast('error', validation.error || 'File video tidak valid');
+      return;
+    }
+
+    setVideo(file);
+    setVideoPreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveVideo = () => {
+    setVideo(null);
+    setVideoPreview(null);
   };
 
   const handleGetCurrentLocation = () => {
@@ -172,16 +217,25 @@ export function CreateReportPage() {
       }
     }
 
-    // Execute insert
-    let photoUrl: string | null = null;
-    if (photo) {
-      photoUrl = await uploadPhoto(photo, 'reports');
-      if (!photoUrl) {
+    // Execute Multi-Photo Upload
+    let photoUrls: string[] = [];
+    if (photos.length > 0) {
+      const uploaded = await Promise.all(photos.map((p) => uploadPhoto(p, 'reports')));
+      photoUrls = uploaded.filter((url): url is string => url !== null);
+      if (photoUrls.length === 0) {
         setError('Gagal mengunggah foto. Coba lagi.');
         setLoading(false);
         return;
       }
     }
+
+    // Execute Video Upload
+    let videoUrl: string | null = null;
+    if (video) {
+      videoUrl = await uploadPhoto(video, 'reports');
+    }
+
+    const primaryPhoto = photoUrls.length > 0 ? photoUrls[0] : null;
 
     const { data, error: insertError } = await supabase
       .from('reports')
@@ -193,7 +247,9 @@ export function CreateReportPage() {
         address: sanitizeString(address, 255),
         latitude: position?.[0] || null,
         longitude: position?.[1] || null,
-        photo_url: photoUrl,
+        photo_url: primaryPhoto,
+        photo_urls: photoUrls,
+        video_url: videoUrl,
         reporter_id: profile?.id,
         wilayah_id: wilayahId || null,
         is_anonymous: isAnonymous,
@@ -329,33 +385,97 @@ export function CreateReportPage() {
           </label>
         </div>
 
-        {/* Photo Upload */}
-        <div className="card p-5">
-          <label className="label flex items-center gap-2">
-            <Camera className="w-4 h-4 text-[#8891A0]" />
-            Foto Bukti di Lokasi (Opsional tapi Direkomendasikan)
-          </label>
-          <div className="mt-2">
-            {photoPreview ? (
-              <div className="relative rounded-[4px] overflow-hidden border border-[#E2E4E0] max-h-60 bg-[#16233D]">
-                <img src={photoPreview} alt="Preview" className="w-full h-48 object-cover" />
-                <button
-                  type="button"
-                  onClick={() => { setPhoto(null); setPhotoPreview(null); }}
-                  className="absolute top-2 right-2 p-1.5 bg-[#16233D]/80 text-white rounded-[4px] hover:bg-[#16233D]"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+        {/* Multi-Photo Evidence Upload */}
+        <div className="card p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="label mb-0 flex items-center gap-2">
+              <Camera className="w-4 h-4 text-[#8891A0]" />
+              Foto Bukti Lapangan (Maksimal 5 Foto)
+            </label>
+            <span className="text-xs font-mono font-bold text-slate-500">
+              {photos.length} / 5 Foto
+            </span>
+          </div>
+
+          {/* Photo Grid Previews */}
+          {photoPreviews.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-1">
+              {photoPreviews.map((preview, idx) => (
+                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-900 group">
+                  <img src={preview} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => handleRemovePhoto(idx)}
+                    className="absolute top-1.5 right-1.5 p-1 bg-red-600/90 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm"
+                    title="Hapus foto ini"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[9px] font-mono font-bold">
+                    #{idx + 1}
+                  </span>
+                </div>
+              ))}
+
+              {photos.length < 5 && (
+                <label className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-slate-400 transition-colors bg-slate-50/50 hover:bg-slate-100/50">
+                  <Plus className="w-6 h-6 text-slate-400 mb-1" />
+                  <span className="text-[11px] font-medium text-slate-600">Tambah Foto</span>
+                  <input type="file" accept="image/*" multiple onChange={handlePhotoChange} className="hidden" />
+                </label>
+              )}
+            </div>
+          )}
+
+          {/* Initial Upload Button if no photos yet */}
+          {photoPreviews.length === 0 && (
+            <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-slate-400 transition-colors bg-slate-50/50 hover:bg-slate-100/50">
+              <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-2">
+                <Camera className="w-5 h-5 text-slate-600" />
               </div>
-            ) : (
-              <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-[#E2E4E0] rounded-[4px] cursor-pointer hover:border-[#8891A0] transition-colors bg-[#F6F7F5]">
-                <Camera className="w-8 h-8 text-[#8891A0] mb-2" />
-                <span className="text-xs font-semibold text-[#16233D]">Klik untuk unggah foto</span>
-                <span className="text-[10px] text-[#8891A0] mt-0.5">JPG, PNG maks 10MB (Otomatis dikompres)</span>
-                <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
-              </label>
+              <span className="text-xs font-semibold text-[#16233D]">Pilih Foto Lapangan (Bisa Pilih Banyak)</span>
+              <span className="text-[10px] text-[#8891A0] mt-0.5">JPG, PNG, WebP maks 10MB per file (Otomatis dikompres)</span>
+              <input type="file" accept="image/*" multiple onChange={handlePhotoChange} className="hidden" />
+            </label>
+          )}
+        </div>
+
+        {/* Video Evidence Upload */}
+        <div className="card p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="label mb-0 flex items-center gap-2">
+              <Film className="w-4 h-4 text-sky-600" />
+              Video Rekaman Bukti (Opsional — Maksimal 1 Video)
+            </label>
+            {video && (
+              <span className="text-[11px] font-mono text-sky-600 font-bold bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+                {(video.size / (1024 * 1024)).toFixed(1)} MB
+              </span>
             )}
           </div>
+
+          {videoPreview ? (
+            <div className="relative rounded-xl overflow-hidden border border-slate-800 bg-black aspect-video max-h-56">
+              <video src={videoPreview} controls className="w-full h-full object-contain" />
+              <button
+                type="button"
+                onClick={handleRemoveVideo}
+                className="absolute top-2 right-2 p-1.5 bg-red-600/90 text-white rounded-md hover:bg-red-700 transition-colors shadow-md flex items-center gap-1 text-xs font-medium"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Hapus Video
+              </button>
+            </div>
+          ) : (
+            <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-sky-200/80 rounded-xl cursor-pointer hover:border-sky-400 transition-colors bg-sky-50/30 hover:bg-sky-50/60">
+              <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center mb-2">
+                <Video className="w-5 h-5 text-sky-600" />
+              </div>
+              <span className="text-xs font-semibold text-slate-800">Unggah Video Bukti Kerusakan / Kondisi Lapangan</span>
+              <span className="text-[10px] text-slate-500 mt-0.5">Format MP4, WebM, MOV maks 35MB</span>
+              <input type="file" accept="video/mp4,video/webm,video/quicktime,video/*" onChange={handleVideoChange} className="hidden" />
+            </label>
+          )}
         </div>
 
         {/* Address & Wilayah */}

@@ -321,27 +321,33 @@ class SupabaseService {
     } catch (_) {}
   }
 
-  /// Mengunggah foto bukti penyelesaian dan menyelesaikan tugas (Alias)
+  /// Mengunggah foto/video bukti penyelesaian dan menyelesaikan tugas (Alias)
   Future<void> completeReport({
     required String reportId,
-    required File proofImage,
+    File? proofImage,
+    List<File>? proofImages,
+    File? proofVideo,
     required String officerNotes,
     double? latitude,
     double? longitude,
   }) async {
+    final images = proofImages ?? (proofImage != null ? [proofImage] : <File>[]);
     return completeReportWithProof(
       reportId: reportId,
-      photoFile: proofImage,
+      photoFiles: images,
+      videoFile: proofVideo,
       officerNotes: officerNotes,
       latitude: latitude,
       longitude: longitude,
     );
   }
 
-  /// Mengunggah foto bukti penyelesaian dan menyelesaikan tugas
+  /// Mengunggah foto-foto & video bukti penyelesaian dan menyelesaikan tugas
   Future<void> completeReportWithProof({
     required String reportId,
-    required File photoFile,
+    File? photoFile,
+    List<File>? photoFiles,
+    File? videoFile,
     required String officerNotes,
     double? latitude,
     double? longitude,
@@ -350,42 +356,60 @@ class SupabaseService {
     if (user == null) throw Exception('Sesi tidak valid.');
 
     final now = DateTime.now().toIso8601String();
-    final fileName = 'proof_${reportId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    final filePath = 'proofs/$fileName';
+    final allImages = photoFiles ?? (photoFile != null ? [photoFile] : <File>[]);
 
-    // 1. Upload foto bukti ke storage Supabase
-    String photoUrl = '';
-    try {
-      await client.storage.from(SupabaseConfig.completionPhotosBucket).upload(
-            filePath,
-            photoFile,
-            fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
-          );
-
-      photoUrl = client.storage
-          .from(SupabaseConfig.completionPhotosBucket)
-          .getPublicUrl(filePath);
-    } catch (_) {
+    // 1. Upload semua foto bukti ke storage Supabase
+    List<String> photoUrls = [];
+    for (int i = 0; i < allImages.length; i++) {
+      final img = allImages[i];
+      final fileName = 'proof_${reportId}_${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
+      final filePath = 'proofs/$fileName';
       try {
         await client.storage.from(SupabaseConfig.reportPhotosBucket).upload(
               filePath,
-              photoFile,
+              img,
               fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
             );
-
-        photoUrl = client.storage
-            .from(SupabaseConfig.reportPhotosBucket)
-            .getPublicUrl(filePath);
-      } catch (uploadErr) {
-        throw Exception('Gagal mengunggah foto bukti: $uploadErr');
+        final url = client.storage.from(SupabaseConfig.reportPhotosBucket).getPublicUrl(filePath);
+        photoUrls.add(url);
+      } catch (err) {
+        try {
+          await client.storage.from(SupabaseConfig.completionPhotosBucket).upload(
+                filePath,
+                img,
+                fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
+              );
+          final url = client.storage.from(SupabaseConfig.completionPhotosBucket).getPublicUrl(filePath);
+          photoUrls.add(url);
+        } catch (_) {}
       }
     }
 
-    // 2. Simpan bukti di tabel completion_proofs
+    // 2. Upload video bukti (jika ada)
+    String? videoUrl;
+    if (videoFile != null) {
+      final ext = videoFile.path.split('.').last.toLowerCase();
+      final vidFileName = 'proof_vid_${reportId}_${DateTime.now().millisecondsSinceEpoch}.$ext';
+      final vidFilePath = 'proofs/$vidFileName';
+      try {
+        await client.storage.from(SupabaseConfig.reportPhotosBucket).upload(
+              vidFilePath,
+              videoFile,
+              fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
+            );
+        videoUrl = client.storage.from(SupabaseConfig.reportPhotosBucket).getPublicUrl(vidFilePath);
+      } catch (_) {}
+    }
+
+    final primaryPhoto = photoUrls.isNotEmpty ? photoUrls.first : '';
+
+    // 3. Simpan bukti di tabel completion_proofs
     try {
       await client.from(SupabaseConfig.completionProofsTable).insert({
         'report_id': reportId,
-        'photo_url': photoUrl,
+        'photo_url': primaryPhoto,
+        'photo_urls': photoUrls,
+        'video_url': videoUrl,
         'note': officerNotes,
         'uploaded_by': user.id,
         'created_at': now,
@@ -394,20 +418,23 @@ class SupabaseService {
       try {
         await client.from(SupabaseConfig.completionProofsTable).insert({
           'report_id': reportId,
-          'photo_url': photoUrl,
-          'notes': officerNotes,
+          'photo_url': primaryPhoto,
+          'note': officerNotes,
+          'uploaded_by': user.id,
           'created_at': now,
         });
       } catch (_) {}
     }
 
-    // 3. Update status laporan di tabel reports
+    // 4. Update status laporan di tabel reports
     try {
       await client.from(SupabaseConfig.reportsTable).update({
         'status': 'completed',
         'completed_at': now,
         'updated_at': now,
-        'completion_photo_url': photoUrl,
+        'completion_photo_url': primaryPhoto,
+        'completion_photo_urls': photoUrls,
+        'completion_video_url': videoUrl,
         'completion_notes': officerNotes,
       }).eq('id', reportId);
     } catch (_) {
@@ -415,6 +442,8 @@ class SupabaseService {
         'status': 'completed',
         'completed_at': now,
         'updated_at': now,
+        'completion_photo_url': primaryPhoto,
+        'completion_notes': officerNotes,
       }).eq('id', reportId);
     }
 
