@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { Report } from '../types';
 import { StatusBadge, CategoryBadge } from '../components/Badges';
 import { VideoBackground } from '../components/VideoBackground';
 import { SplineScene } from '../components/SplineScene';
+import { ThemeToggle } from '../components/ThemeToggle';
 import {
   ShieldCheck, MapPin, ArrowRight,
   CheckCircle2, FileText, Clock, Eye,
@@ -100,7 +102,7 @@ const SERVICES = [
 
 export function LandingPage() {
   const { session, profile, signOut } = useAuth();
-  const isDark = true;
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const [publicReports, setPublicReports] = useState<Report[]>([]);
   const [loadingReports, setLoadingReports] = useState(true);
@@ -171,6 +173,7 @@ export function LandingPage() {
 
             {/* Right Contact & Portal CTA */}
             <div className="flex items-center gap-3 text-xs font-semibold">
+              <ThemeToggle variant="compact" />
               
               {session ? (
                 <div className="flex items-center gap-2">

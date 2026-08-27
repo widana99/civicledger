@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id" class="dark">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -7,6 +7,27 @@
     <meta name="theme-color" content="#070A11" />
     <meta name="description" content="CivicLedger — Platform Pelaporan Infrastruktur & Lingkungan Kota Cerdas Berbasis Geospasial Real-time" />
     
+    <!-- ═══════ THEME INITIALIZATION (PREVENT FLASH OF WRONG THEME) ═══════ -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('civicledger-theme');
+          var isDark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.add('light');
+            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.documentElement.style.colorScheme = 'light';
+          }
+        } catch (e) {}
+      })();
+    </script>
+
     <!-- ═══════ ENTERPRISE SECURITY HEADERS ═══════ -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
@@ -24,7 +45,7 @@
     
     <title>CivicLedger — Sistem Laporan Kota</title>
   </head>
-  <body class="bg-[#070A11] text-slate-100 font-sans antialiased selection:bg-[#0EA58D] selection:text-white">
+  <body class="font-sans antialiased selection:bg-[#0EA58D] selection:text-white transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -7,6 +7,7 @@ import {
   Loader2, ArrowLeft, AlertCircle, Info, CheckCircle2,
   KeyRound, ArrowRight, Sparkles, ExternalLink,
 } from 'lucide-react';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 type AuthMode = 'signin' | 'signup' | 'otp-verify';
 
@@ -323,33 +324,36 @@ export function AuthPage() {
       </div>
 
       {/* Right side - Form with Liquid Glass Card */}
-      <div className="flex-1 flex flex-col justify-center py-10 px-4 sm:px-8 lg:px-14 bg-[#F8FAFC]">
+      <div className="flex-1 flex flex-col justify-center py-10 px-4 sm:px-8 lg:px-14 bg-[#F8FAFC] dark:bg-[#070A11] transition-colors duration-300">
         <div className="w-full max-w-md mx-auto space-y-6">
           
           <div className="flex items-center justify-between">
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#0B132B] transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-[#0B132B] dark:hover:text-white transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Kembali ke Beranda
             </Link>
 
-            <div className="lg:hidden flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#0EA58D] text-[#080E1F] flex items-center justify-center shadow-sm">
-                <ShieldCheck className="w-5 h-5 font-bold" />
+            <div className="flex items-center gap-3">
+              <ThemeToggle variant="compact" />
+              <div className="lg:hidden flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[#0EA58D] text-[#080E1F] flex items-center justify-center shadow-sm">
+                  <ShieldCheck className="w-5 h-5 font-bold" />
+                </div>
+                <span className="font-display font-bold text-sm text-[#0B132B] dark:text-white">CivicLedger</span>
               </div>
-              <span className="font-display font-bold text-sm text-[#0B132B]">CivicLedger</span>
             </div>
           </div>
 
           {/* Prompt banner if redirected from 'Buat Laporan' */}
           {isFromReporting && (
-            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[#0B132B] text-xs flex items-start gap-3 shadow-xs animate-slide-up">
-              <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[#0B132B] dark:text-amber-200 text-xs flex items-start gap-3 shadow-xs animate-slide-up">
+              <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
                 <span className="font-bold block text-xs">Login Diperlukan untuk Melapor</span>
-                <span className="text-slate-600 text-[11px]">
+                <span className="text-slate-600 dark:text-slate-300 text-[11px]">
                   Silakan masuk atau daftarkan akun baru Anda untuk mengirimkan laporan resmi dengan perlindungan data.
                 </span>
               </div>
@@ -357,7 +361,7 @@ export function AuthPage() {
           )}
 
           {/* Form Container with Liquid Glass Styling */}
-          <div className="rounded-3xl p-6 sm:p-8 bg-white/80 backdrop-blur-2xl border border-white shadow-[0_10px_35px_rgba(11,19,43,0.06)] space-y-5">
+          <div className="rounded-3xl p-6 sm:p-8 bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-2xl border border-white dark:border-slate-800 shadow-[0_10px_35px_rgba(11,19,43,0.06)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] space-y-5 transition-colors duration-300">
             
             <StepIndicator />
 
@@ -365,10 +369,10 @@ export function AuthPage() {
             {mode === 'signin' && (
               <>
                 <div>
-                  <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#0B132B]">
+                  <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#0B132B] dark:text-white">
                     Masuk ke Portal
                   </h2>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
                     Gunakan akun Anda untuk membuat dan memantau status laporan kota
                   </p>
                 </div>

@@ -7,6 +7,7 @@ import { MapView, MapLegend, MapMarkerItem } from '../components/MapComponents';
 import { StatusBadge, CategoryBadge, PriorityBadge } from '../components/Badges';
 import { STATUS_CONFIG, CATEGORY_OPTIONS, formatDateTime, timeAgo } from '../lib/constants';
 import { DateTimeFilter, DateTimeFilterState, INITIAL_DATE_TIME_FILTER, matchesDateTimeFilter } from '../components/DateTimeFilter';
+import { ThemeToggle } from '../components/ThemeToggle';
 import {
   MapPin, Filter, X, Search, ShieldCheck, ArrowRight,
   PlusCircle, RefreshCw, Layers, Calendar, Eye, Shield,
@@ -138,6 +139,8 @@ export function PublicMapPage() {
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-3">
+            <ThemeToggle variant="compact" />
+
             {isAdmin ? (
               <div className="flex items-center gap-2">
                 <Link

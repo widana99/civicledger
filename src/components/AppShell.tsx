@@ -3,6 +3,7 @@ import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { RoleBadge } from './Badges';
+import { ThemeToggle } from './ThemeToggle';
 
 import { STATUS_CONFIG, timeAgo } from '../lib/constants';
 import { usePushNotifications } from '../lib/usePushNotifications';
@@ -353,6 +354,9 @@ export function AppShell() {
 
       {/* User Footer Profile in Sidebar */}
       <div className="border-t border-white/10 p-4 bg-[#0B132B]/60 backdrop-blur-md">
+        <div className="mb-3">
+          <ThemeToggle variant="pill" className="w-full justify-center" />
+        </div>
         <div className="flex items-center gap-3 mb-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0EA58D] to-[#E5A93C] p-[1.5px] flex-shrink-0">
             <div className="w-full h-full bg-[#080E1F] rounded-[10px] flex items-center justify-center font-bold text-xs text-white">
@@ -378,7 +382,7 @@ export function AppShell() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex font-sans selection:bg-[#E5A93C]/30">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#070A11] flex font-sans selection:bg-[#E5A93C]/30 text-slate-900 dark:text-slate-100 transition-colors duration-300">
       
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex w-64 fixed inset-y-0 left-0 z-30 shadow-2xl">
@@ -402,15 +406,15 @@ export function AppShell() {
       <div className="flex-1 lg:ml-64 flex flex-col min-w-0">
         
         {/* Sticky Frosted Header */}
-        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/80 px-4 lg:px-8 py-3 flex items-center justify-between shadow-xs">
+        <header className="sticky top-0 z-20 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800 px-4 lg:px-8 py-3 flex items-center justify-between shadow-xs transition-colors duration-300">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-xl hover:bg-slate-100 text-[#0B132B] transition-colors"
+              className="lg:hidden p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-[#0B132B] dark:text-white transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 uppercase tracking-wider font-semibold">
+            <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
               <span className="w-2 h-2 rounded-full bg-[#0EA58D] animate-ping" />
               {profile.role === 'admin'
                 ? 'Portal Administrator Wilayah'
@@ -419,25 +423,28 @@ export function AppShell() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Theme Toggle Button */}
+            <ThemeToggle variant="compact" />
+
             {/* Notification Bell with Frosted Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setShowNotifOpen(!showNotifOpen)}
-                className="relative p-2.5 rounded-xl border border-slate-200 bg-white/90 hover:bg-white hover:border-[#0EA58D]/40 transition-all shadow-xs"
+                className="relative p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 hover:border-[#0EA58D]/40 transition-all shadow-xs"
                 title="Pemberitahuan Aktivitas"
               >
-                <Bell className="w-4 h-4 text-[#0B132B]" />
+                <Bell className="w-4 h-4 text-[#0B132B] dark:text-slate-200" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-mono font-bold flex items-center justify-center px-1 ring-2 ring-white">
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-mono font-bold flex items-center justify-center px-1 ring-2 ring-white dark:ring-slate-900">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
               </button>
 
               {showNotifOpen && (
-                <div className="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl bg-white/95 backdrop-blur-2xl border border-slate-200/80 shadow-[0_20px_50px_rgba(11,19,43,0.15)] z-50 animate-scale-in overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/80">
-                    <span className="text-xs font-bold font-display text-[#0B132B] uppercase tracking-wider">Aktivitas & Notifikasi</span>
+                <div className="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200/80 dark:border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.3)] z-50 animate-scale-in overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60">
+                    <span className="text-xs font-bold font-display text-[#0B132B] dark:text-white uppercase tracking-wider">Aktivitas & Notifikasi</span>
                     <div className="flex items-center gap-2.5">
                       {unreadCount > 0 && (
                         <button

@@ -16,11 +16,11 @@
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
-  .dark body {
+  html.dark, html.dark body, body.dark {
     background-color: #070A11;
     color: #F8FAFC;
   }
-  .light body {
+  html.light, html.light body, body.light {
     background-color: #F8FAFC;
     color: #0F172A;
   }
@@ -127,18 +127,30 @@
   .card {
     @apply liquid-glass rounded-xl;
   }
+  .dark .card {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 30, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    color: #F8FAFC;
+  }
   
   .ticket-card {
     @apply liquid-glass rounded-xl relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5;
   }
+  .dark .ticket-card {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 30, 0.9) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #F8FAFC;
+  }
   
   .ticket-stub {
-    @apply border-r-2 border-dashed border-[#CBD5E1];
+    @apply border-r-2 border-dashed border-[#CBD5E1] dark:border-slate-700;
   }
 
   /* ───── Form Inputs ───── */
   .input {
-    @apply w-full rounded-lg border border-[#CBD5E1]/80 bg-white/90 backdrop-blur-md px-3.5 py-2.5 text-sm text-[#0B132B] placeholder:text-[#94A3B8] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#0EA58D]/30 focus:border-[#0EA58D] shadow-sm;
+    @apply w-full rounded-lg border border-[#CBD5E1]/80 bg-white/90 dark:bg-slate-900/90 dark:border-slate-700 dark:text-white backdrop-blur-md px-3.5 py-2.5 text-sm text-[#0B132B] placeholder:text-[#94A3B8] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#0EA58D]/30 focus:border-[#0EA58D] shadow-sm;
   }
   
   .input-error {
@@ -146,7 +158,7 @@
   }
   
   .label {
-    @apply block text-xs font-semibold uppercase tracking-wider text-[#475569] mb-1.5 font-display;
+    @apply block text-xs font-semibold uppercase tracking-wider text-[#475569] dark:text-slate-400 mb-1.5 font-display;
   }
   
   .badge {
