@@ -25,6 +25,7 @@ export interface Profile {
   phone: string | null;
   role: Role;
   wilayah_id: string | null;
+  department?: string | null;
   is_active: boolean;
   created_at: string;
 }
@@ -43,7 +44,7 @@ export interface Report {
   description: string;
   category: ReportCategory;
   status: ReportStatus;
-  priority: Priority;
+  priority: ReportPriority;
   address: string;
   latitude: number | null;
   longitude: number | null;
@@ -55,6 +56,8 @@ export interface Report {
   started_at: string | null;
   completed_at: string | null;
   rejected_reason: string | null;
+  is_anonymous?: boolean;
+  estimated_completion_at?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -115,4 +118,17 @@ export interface ReportWithRelations extends Report {
   assigned_petugas?: Profile | null;
   upvotes?: { count: number }[];
   completion_proofs?: CompletionProof[];
+}
+
+export type NotificationType = 'status_change' | 'comment' | 'assignment' | 'escalation' | 'system';
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  is_read: boolean;
+  report_id: string | null;
+  created_at: string;
 }

@@ -1,2 +1,55 @@
+# Dependencies
 node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+build/
+
+# Environment variables (NEVER commit these)
 .env
+.env.local
+.env.production
+.env.*.local
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Debug & test scripts
+scratch/
+*.mjs
+test_*.mjs
+inspect_*.mjs
+check_*.mjs
+
+# Codegraph index (generated)
+.codegraph/
+
+# Agent/AI tool configs
+.gemini/
+.claude/
+.cursor/
+.kiro/
+.superpowers/
+.agents/
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Flutter (mobile app has its own .gitignore)
+civicledger_field_app/build/
+civicledger_field_app/.dart_tool/
+civicledger_field_app/.packages

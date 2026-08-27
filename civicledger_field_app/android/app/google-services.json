@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "676831328377",
+    "project_id": "civicledger-d595d",
+    "storage_bucket": "civicledger-d595d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676831328377:android:3c6b1a48e714770d90fca8",
+        "android_client_info": {
+          "package_name": "com.example.civicledger_field_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6nkmFS9FbWbbFa8-w6_5Yjw5kMr_c6xM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
