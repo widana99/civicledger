@@ -31,6 +31,7 @@ export function AuthPage() {
 
   const [mode, setMode] = useState<AuthMode>('signin');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -44,6 +45,53 @@ export function AuthPage() {
   const [otpCode, setOtpCode] = useState('');
 
   const isFromReporting = redirectTarget.includes('create-report');
+
+  // Auto-recovery for Google OAuth cancellation or popup close
+  useEffect(() => {
+    const handleFocus = () => {
+      setTimeout(() => {
+        setGoogleLoading(false);
+        setLoading(false);
+      }, 600);
+    };
+
+    window.addEventListener('focus', handleFocus);
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        handleFocus();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    // Check for error parameters in URL query or hash
+    const errorParam = searchParams.get('error') || searchParams.get('error_description');
+    const hash = window.location.hash;
+    if (errorParam) {
+      const desc = searchParams.get('error_description') || errorParam;
+      setError(
+        desc.includes('access_denied') || desc.includes('cancelled')
+          ? 'Login Google dibatalkan. Silakan coba kembali.'
+          : `Autentikasi gagal: ${desc}`
+      );
+      setLoading(false);
+      setGoogleLoading(false);
+    } else if (hash && hash.includes('error=')) {
+      const params = new URLSearchParams(hash.replace(/^#/, ''));
+      const desc = params.get('error_description') || params.get('error') || '';
+      setError(
+        desc.includes('access_denied') || desc.includes('cancelled')
+          ? 'Login Google dibatalkan. Silakan coba kembali.'
+          : `Autentikasi gagal: ${desc.replace(/\+/g, ' ')}`
+      );
+      setLoading(false);
+      setGoogleLoading(false);
+    }
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [searchParams]);
 
   useEffect(() => {
     if (session) {
@@ -86,11 +134,20 @@ export function AuthPage() {
   /* ═══════ Sign In with Google ═══════ */
   const handleGoogleSignIn = async () => {
     setError(null);
-    setLoading(true);
-    const { error } = await signInWithGoogle();
-    if (error) {
-      setError(error);
-      setLoading(false);
+    setGoogleLoading(true);
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) {
+        setError(error);
+        setGoogleLoading(false);
+      }
+      // Safety auto-reset timeout in case user aborts
+      setTimeout(() => {
+        setGoogleLoading(false);
+      }, 8000);
+    } catch (err: any) {
+      setError(err?.message || 'Gagal masuk dengan Google');
+      setGoogleLoading(false);
     }
   };
 
@@ -393,19 +450,24 @@ export function AuthPage() {
 
                 {/* Google Sign In */}
                 <button
+                  type="button"
                   onClick={handleGoogleSignIn}
-                  disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-slate-200 bg-white/90 hover:bg-white hover:border-[#E5A93C]/50 hover:shadow-md transition-all text-sm font-bold text-[#0B132B] shadow-xs group"
+                  disabled={googleLoading || loading}
+                  className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 hover:border-[#E5A93C]/50 hover:shadow-md transition-all text-sm font-bold text-[#0B132B] dark:text-white shadow-xs group cursor-pointer disabled:opacity-60"
                 >
-                  <GoogleIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  Masuk dengan Google
+                  {googleLoading ? (
+                    <Loader2 className="w-5 h-5 text-[#E5A93C] animate-spin" />
+                  ) : (
+                    <GoogleIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  )}
+                  <span>{googleLoading ? 'Menghubungkan ke Google...' : 'Masuk dengan Google'}</span>
                 </button>
 
                 {/* Divider */}
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px bg-slate-200" />
+                  <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
                   <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider font-semibold">atau email</span>
-                  <div className="flex-1 h-px bg-slate-200" />
+                  <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
                 </div>
 
                 <form onSubmit={handleSignIn} className="space-y-4">
@@ -442,18 +504,18 @@ export function AuthPage() {
 
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || googleLoading}
                     className="btn-accent w-full btn-lg font-bold shadow-glow-gold flex items-center justify-center gap-2"
                   >
                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Masuk Sekarang'}
                   </button>
                 </form>
 
-                <div className="pt-2 text-center text-xs text-slate-500 border-t border-slate-100 font-medium">
+                <div className="pt-2 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 font-medium">
                   Belum memiliki akun warga?{' '}
                   <button
                     onClick={() => { setMode('signup'); setError(null); setSuccess(null); }}
-                    className="font-bold text-[#0B132B] hover:text-[#0EA58D] underline transition-colors"
+                    className="font-bold text-[#0B132B] dark:text-[#2DD4BF] hover:text-[#0EA58D] underline transition-colors"
                   >
                     Daftar di sini
                   </button>
@@ -465,35 +527,40 @@ export function AuthPage() {
             {mode === 'signup' && (
               <>
                 <div>
-                  <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#0B132B]">
+                  <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#0B132B] dark:text-white">
                     Registrasi Akun
                   </h2>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
                     Lengkapi data diri Anda untuk mendaftar sebagai warga kota
                   </p>
                 </div>
 
                 {error && (
-                  <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2.5 animate-slide-up">
-                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-rose-600" />
+                  <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-slide-up">
+                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-rose-600 dark:text-rose-400" />
                     <span>{error}</span>
                   </div>
                 )}
 
                 {/* Google Sign Up */}
                 <button
+                  type="button"
                   onClick={handleGoogleSignIn}
-                  disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-slate-200 bg-white/90 hover:bg-white hover:border-[#E5A93C]/50 hover:shadow-md transition-all text-sm font-bold text-[#0B132B] shadow-xs group"
+                  disabled={googleLoading || loading}
+                  className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 hover:border-[#E5A93C]/50 hover:shadow-md transition-all text-sm font-bold text-[#0B132B] dark:text-white shadow-xs group cursor-pointer disabled:opacity-60"
                 >
-                  <GoogleIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  Daftar dengan Google
+                  {googleLoading ? (
+                    <Loader2 className="w-5 h-5 text-[#E5A93C] animate-spin" />
+                  ) : (
+                    <GoogleIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  )}
+                  <span>{googleLoading ? 'Menghubungkan ke Google...' : 'Daftar dengan Google'}</span>
                 </button>
 
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px bg-slate-200" />
+                  <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
                   <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider font-semibold">atau formulir</span>
-                  <div className="flex-1 h-px bg-slate-200" />
+                  <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
                 </div>
 
                 <form onSubmit={handleSignUpForm} className="space-y-4">

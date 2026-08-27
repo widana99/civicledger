@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { Report } from '../../types';
 import { MapView, MapMarkerItem, MapLegend } from '../../components/MapComponents';
 import { TicketCard } from '../../components/TicketCard';
-import { STATUS_CONFIG } from '../../lib/constants';
+import { STATUS_CONFIG, normalizeReportStatus } from '../../lib/constants';
 import {
   FilePlus2, MapPin, CheckCircle2, Clock,
   TrendingUp, ShieldCheck, ArrowRight,
@@ -43,8 +43,14 @@ export function CitizenDashboard() {
         .not('latitude', 'is', null)
         .order('created_at', { ascending: false });
 
-      const myReps = (myData as Report[]) || [];
-      const allReps = (allData as Report[]) || [];
+      const myReps = ((myData as any[]) || []).map((r) => ({
+        ...r,
+        status: normalizeReportStatus(r.status),
+      }));
+      const allReps = ((allData as any[]) || []).map((r) => ({
+        ...r,
+        status: normalizeReportStatus(r.status),
+      }));
 
       setMyReports(myReps);
       setAllReports(allReps);
