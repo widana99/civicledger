@@ -201,3 +201,11 @@ class ClientRateLimiter {
 }
 
 export const rateLimiter = new ClientRateLimiter();
+
+/**
+ * Validates that user account is active and not suspended
+ */
+export function isAccountActive(profile: { is_active?: boolean } | null | undefined): boolean {
+  if (!profile) return true; // Handled by auth session check
+  return profile.is_active !== false;
+}

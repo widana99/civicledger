@@ -35,13 +35,14 @@ If there is no `.codegraph/` directory, skip CodeGraph entirely — indexing is 
 
 ---
 
-## ⚡ Skills Auto-Invocation Matrix
+## ⚡ Universal Skills Auto-Invocation (ACTIVE ON EVERY PROMPT)
 
-Every agent working in this repo MUST automatically trigger the corresponding skill based on the task type:
+Every agent working in this repo MUST automatically trigger and strictly adhere to all relevant skills on **EVERY USER PROMPT** without requiring explicit invocation:
 
 | Task Domain | Mandatory Skills | Auto-Trigger Conditions |
 |---|---|---|
-| **UI / UX / Styling** | `impeccable`, `design-taste-frontend`, `high-end-visual-design`, `stitch-design-taste` | Any modification or creation of components, layouts, maps, mobile officer view, forms, badges, modals, charts. Enforce anti-slop, high contrast, clean typography, responsive design. |
+| **Universal Baseline** | `full-output-enforcement`, `ponytail`, `verification-before-completion` | Active on EVERY prompt. Full code output without placeholders, minimal direct code, mandatory lint/build evidence before completion claims. |
+| **UI / UX / Styling** | `impeccable`, `design-taste-frontend`, `high-end-visual-design`, `stitch-design-taste`, `minimalist-ui` | Any modification or creation of components, layouts, maps, mobile officer view, forms, badges, modals, charts. Enforce anti-slop, high contrast, clean typography, responsive design. |
 | **Code Efficiency** | `ponytail`, `full-output-enforcement` | Any code implementation. Enforce minimal working solution, YAGNI, standard browser APIs, no unnecessary dependencies, complete unabridged output. |
 | **Token Optimization** | `caveman`, `cavecrew` | Subagent outputs, summaries, PR/code reviews, commit messages (`caveman-commit`). |
 | **Planning & Design** | `brainstorming`, `writing-plans`, `executing-plans`, `using-superpowers` | Any new feature, multi-step refactor, database schema change, or architectural decision. |

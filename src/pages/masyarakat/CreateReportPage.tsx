@@ -9,7 +9,7 @@ import { ReportCategory, ReportPriority, Report } from '../../types';
 import { MapPicker } from '../../components/MapComponents';
 import { TicketCard } from '../../components/TicketCard';
 import { HoneypotField } from '../../components/HoneypotField';
-import { validateSafeInput, validateFileUpload, rateLimiter, sanitizeString, sanitizeText } from '../../utils/security';
+import { validateSafeInput, validateFileUpload, rateLimiter, sanitizeString, sanitizeText, isAccountActive } from '../../utils/security';
 import {
   Camera, MapPin, Loader2, AlertCircle, CheckCircle2, X,
   FileText, Tag, Layers, AlertTriangle, ThumbsUp, ArrowRight,
@@ -132,6 +132,14 @@ export function CreateReportPage() {
   const checkDuplicatesAndProceed = async (bypassDuplicateCheck = false) => {
     setError(null);
 
+    // 0. Account Active Status Check
+    if (profile && !isAccountActive(profile)) {
+      const banMsg = 'Akun Anda dinonaktifkan oleh Administrator. Tidak dapat membuat laporan.';
+      setError(banMsg);
+      addToast('error', banMsg);
+      return;
+    }
+
     // 1. Anti-Bot Honeypot trap check
     if (honeypot.trim() !== '') {
       console.warn('[Security Shield] Automated bot honeypot triggered');
@@ -180,6 +188,12 @@ export function CreateReportPage() {
     if (!descCheck.isSafe) {
       setError(`Deskripsi tidak valid: ${descCheck.threat}`);
       addToast('error', 'Karakter terlarang ditemukan pada deskripsi');
+      return;
+    }
+    const addressCheck = validateSafeInput(address);
+    if (!addressCheck.isSafe) {
+      setError(`Alamat tidak valid: ${addressCheck.threat}`);
+      addToast('error', 'Karakter terlarang ditemukan pada alamat');
       return;
     }
 

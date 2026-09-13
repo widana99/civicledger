@@ -10,6 +10,7 @@ import { Loader2, AlertCircle, ArrowLeft, Eye, ShieldCheck, Sparkles } from 'luc
 import { useToast } from '../context/ToastContext';
 import { PublicReportView } from '../components/report/PublicReportView';
 import { OwnerReportView } from '../components/report/OwnerReportView';
+import { sanitizeText, validateSafeInput, rateLimiter, isAccountActive } from '../utils/security';
 
 export function ReportDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -131,11 +132,35 @@ export function ReportDetailPage() {
       addToast('warning', 'Silakan masuk terlebih dahulu untuk berkomentar');
       return;
     }
+    if (!isAccountActive(profile)) {
+      addToast('error', 'Akun Anda dinonaktifkan oleh Administrator. Tidak dapat berkomentar.');
+      return;
+    }
     if (!report || !newComment.trim()) return;
+
+    // Rate limiting: Max 8 comments per 2 minutes
+    const rateCheck = rateLimiter.checkRateLimit('post_comment', 8, 2 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      addToast('warning', `Batas komentar tercapai. Silakan tunggu ${rateCheck.waitSeconds} detik.`);
+      return;
+    }
+
+    // Input security verification
+    const inputCheck = validateSafeInput(newComment);
+    if (!inputCheck.isSafe) {
+      addToast('error', `Tanggapan tidak valid: ${inputCheck.threat}`);
+      return;
+    }
+
+    const cleanContent = sanitizeText(newComment.trim());
+    if (!cleanContent) {
+      addToast('warning', 'Tanggapan tidak boleh kosong.');
+      return;
+    }
 
     const { data, error: commentError } = await supabase
       .from('comments')
-      .insert({ report_id: report.id, user_id: profile.id, content: newComment.trim() })
+      .insert({ report_id: report.id, user_id: profile.id, content: cleanContent })
       .select('id, content, created_at, user_id')
       .single();
 
@@ -150,12 +175,35 @@ export function ReportDetailPage() {
 
   const handleRating = async (score: number) => {
     if (!profile || !report) return;
+
+    if (!isAccountActive(profile)) {
+      addToast('error', 'Akun Anda dinonaktifkan. Tidak dapat memberikan rating.');
+      return;
+    }
+
+    // Security Business Logic: Only completed reports can be rated
+    if (report.status !== 'completed') {
+      addToast('warning', 'Hanya laporan yang telah selesai ditangani yang dapat dinilai.');
+      return;
+    }
+
+    // Security Business Logic: Only original reporter or admin can rate
+    if (report.reporter_id !== profile.id && profile.role !== 'admin') {
+      addToast('error', 'Hanya warga pelapor yang berhak menilai hasil pengerjaan tiket ini.');
+      return;
+    }
+
     setUserRating(score);
-    await supabase
+    const { error: ratingError } = await supabase
       .from('ratings')
       .upsert({ report_id: report.id, user_id: profile.id, score }, { onConflict: 'report_id, user_id' });
-    addToast('success', `Terima kasih! Anda memberikan rating ${score} bintang atas kinerja dinas.`);
-    fetchAll();
+
+    if (ratingError) {
+      addToast('error', 'Gagal menyimpan rating: ' + ratingError.message);
+    } else {
+      addToast('success', `Terima kasih! Anda memberikan rating ${score} bintang atas kinerja dinas.`);
+      fetchAll();
+    }
   };
 
   if (loading) {
