@@ -24,6 +24,7 @@ If there is no `.codegraph/` directory, skip CodeGraph entirely — indexing is 
 - **Frontend Core**: React 18 + Vite (SPA)
 - **Language**: TypeScript (Strict Mode, 0 `any` policy)
 - **Styling & Animation**: Tailwind CSS, Framer Motion, Custom CSS Glassmorphism/Tokens
+- **3D & WebGL Graphics**: Three.js, ThreeUI, Spline WebGL Engine
 - **Mapping & Geolocation**: Leaflet + React-Leaflet, OpenStreetMap Tiles, Browser Geolocation API
 - **Charts & Data Viz**: Recharts
 - **Icons**: Lucide React
@@ -43,6 +44,7 @@ Every agent working in this repo MUST automatically trigger and strictly adhere 
 |---|---|---|
 | **Universal Baseline** | `full-output-enforcement`, `ponytail`, `verification-before-completion` | Active on EVERY prompt. Full code output without placeholders, minimal direct code, mandatory lint/build evidence before completion claims. |
 | **UI / UX / Styling** | `impeccable`, `design-taste-frontend`, `high-end-visual-design`, `stitch-design-taste`, `minimalist-ui` | Any modification or creation of components, layouts, maps, mobile officer view, forms, badges, modals, charts. Enforce anti-slop, high contrast, clean typography, responsive design. |
+| **3D & WebGL Graphics** | `threeui`, `threejs`, `threejs-fundamentals`, `threejs-animation`, `threejs-shaders`, `threejs-interaction` | Creating, updating, or optimizing 3D canvases, WebGL components, ThreeUI widgets, particle networks, or shader effects. |
 | **Code Efficiency** | `ponytail`, `full-output-enforcement` | Any code implementation. Enforce minimal working solution, YAGNI, standard browser APIs, no unnecessary dependencies, complete unabridged output. |
 | **Token Optimization** | `caveman`, `cavecrew` | Subagent outputs, summaries, PR/code reviews, commit messages (`caveman-commit`). |
 | **Planning & Design** | `brainstorming`, `writing-plans`, `executing-plans`, `using-superpowers` | Any new feature, multi-step refactor, database schema change, or architectural decision. |

@@ -327,14 +327,12 @@ export function AuthPage() {
 
         <div className="relative z-10">
           <Link to="/" className="flex items-center gap-3 w-fit group">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#0EA58D] via-[#2DD4BF] to-[#E5A93C] p-[1.5px] shadow-glow-teal group-hover:scale-105 transition-transform duration-300">
-              <div className="w-full h-full bg-[#080E1F] rounded-[10px] flex items-center justify-center">
-                <ShieldCheck className="w-6 h-6 text-[#2DD4BF]" />
-              </div>
+            <div className="w-12 h-12 rounded-2xl bg-white p-1.5 shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-300 flex items-center justify-center">
+              <img src="/images/logo.png" alt="LaporinAja Logo" className="w-full h-full object-contain" />
             </div>
             <div>
-              <div className="font-display font-black text-xl text-white tracking-tight">CivicLedger</div>
-              <div className="text-[10px] font-mono text-[#E5A93C] tracking-widest uppercase font-semibold">Portal Laporan Kota</div>
+              <div className="font-display font-black text-2xl text-white tracking-tight">LaporinAja</div>
+              <div className="text-[10px] font-mono text-[#D4A843] tracking-widest uppercase font-semibold">Suara Anda, Perubahan Nyata</div>
             </div>
           </Link>
         </div>
@@ -376,7 +374,7 @@ export function AuthPage() {
         </div>
 
         <div className="relative z-10 text-[11px] font-mono text-slate-500">
-          © {new Date().getFullYear()} CivicLedger — Pemerintah Kota & Partisipasi Masyarakat
+          © {new Date().getFullYear()} LaporinAja — Pemerintah Kota & Partisipasi Masyarakat
         </div>
       </div>
 
@@ -396,10 +394,10 @@ export function AuthPage() {
             <div className="flex items-center gap-3">
               <ThemeToggle variant="compact" />
               <div className="lg:hidden flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#0EA58D] text-[#080E1F] flex items-center justify-center shadow-sm">
-                  <ShieldCheck className="w-5 h-5 font-bold" />
+                <div className="w-8 h-8 rounded-lg bg-white p-1 shadow-xs border border-slate-200 dark:border-slate-800 flex items-center justify-center">
+                  <img src="/images/logo.png" alt="LaporinAja Logo" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-display font-bold text-sm text-[#0B132B] dark:text-white">CivicLedger</span>
+                <span className="font-display font-bold text-sm text-[#0B132B] dark:text-white">LaporinAja</span>
               </div>
             </div>
           </div>

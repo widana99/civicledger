@@ -239,28 +239,33 @@ class _LoginScreenState extends State<LoginScreen> {
                   // App Emblem & Header
                   Center(
                     child: Container(
-                      padding: const EdgeInsets.all(16),
+                      width: 80,
+                      height: 80,
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppColors.obsidian,
-                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.obsidian.withValues(alpha: 0.2),
-                            blurRadius: 15,
+                            color: AppColors.obsidian.withValues(alpha: 0.12),
+                            blurRadius: 18,
                             offset: const Offset(0, 6),
                           ),
                         ],
+                        border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
                       ),
-                      child: const Icon(
-                        Icons.shield_outlined,
-                        size: 40,
-                        color: AppColors.amber,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
                   Text(
-                    'CIVICLEDGER',
+                    'LAPORINAJA',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 24,

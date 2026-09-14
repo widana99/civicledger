@@ -6,7 +6,8 @@ import { Report, ReportStatus } from '../../types';
 import { TicketCard } from '../../components/TicketCard';
 import { DateTimeFilter, DateTimeFilterState, INITIAL_DATE_TIME_FILTER, matchesDateTimeFilter } from '../../components/DateTimeFilter';
 import { STATUS_CONFIG, normalizeReportStatus } from '../../lib/constants';
-import { FilePlus2, Search, Inbox, RefreshCw, Radio } from 'lucide-react';
+import { FilePlus2, Search, Inbox, RefreshCw, Radio, Award, Sparkles } from 'lucide-react';
+import { CivicBadge3D, CivicBadgeType } from '../../components/CivicBadge3D';
 
 const STATUS_FILTERS: { value: ReportStatus | 'all'; label: string }[] = [
   { value: 'all', label: 'Semua Status' },
@@ -146,6 +147,47 @@ export function MyReportsPage() {
           <Link to="/app/create-report" className="btn-accent text-[#0B132B] font-bold shadow-glow-gold">
             <FilePlus2 className="w-4 h-4" />
             <span>Buat Laporan Baru</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* ───── 3D HOLOGRAPHIC REPUTATION BANNER ───── */}
+      <div className="rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950 border border-slate-800 text-white shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 overflow-hidden relative">
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="relative flex-shrink-0">
+            <CivicBadge3D
+              badgeType={reports.length >= 5 ? 'warga_teladan' : 'terverifikasi'}
+              size="md"
+              interactive={true}
+              showLabel={false}
+            />
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5 text-xs font-mono text-amber-400 mb-1">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Kredensial Partisipasi Aktif Kota</span>
+            </div>
+            <h3 className="font-bold text-base sm:text-lg text-white">
+              {reports.length >= 5 ? 'Warga Teladan — Tier III (Emas)' : 'Pelapor Terverifikasi — Tier II (Zamrud)'}
+            </h3>
+            <p className="text-xs text-slate-400 max-w-md mt-0.5 leading-relaxed">
+              Anda memiliki kontribusi tercatat sebanyak <strong className="text-emerald-400">{reports.length} laporan</strong> di smart city ledger. Sentuh untuk memutar lencana 3D.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-800 relative z-10">
+          <div className="text-left sm:text-right">
+            <span className="text-[10px] font-mono text-slate-400 uppercase block">Penyelesaian Laporan</span>
+            <span className="text-sm font-extrabold font-mono text-emerald-400">
+              {reports.length > 0 ? `${Math.round((statusCounts.completed / reports.length) * 100)}% Tuntas` : '0%'}
+            </span>
+          </div>
+          <Link
+            to="/profile"
+            className="text-[11px] font-mono font-bold text-cyan-400 hover:text-cyan-300 underline underline-offset-4"
+          >
+            Lihat Semua Lencana →
           </Link>
         </div>
       </div>

@@ -101,15 +101,15 @@ export function ReceiptModal({
           {/* Official Letterhead */}
           <div className="border-b-2 border-slate-950 pb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-slate-950 text-white flex items-center justify-center font-display font-extrabold text-xl shadow-md border-2 border-[#D4A843]">
-                CL
+              <div className="w-12 h-12 rounded-2xl bg-white p-1 flex items-center justify-center shadow-md border border-slate-200">
+                <img src="/images/logo.png" alt="LaporinAja Logo" className="w-full h-full object-contain" />
               </div>
               <div>
                 <h2 className="font-display font-extrabold text-xl text-slate-950 uppercase tracking-tight">
-                  CIVICLEDGER REPUBLIK INDONESIA
+                  LAPORINAJA REPUBLIK INDONESIA
                 </h2>
                 <p className="text-xs text-slate-600 font-mono">
-                  Sistem Informasi Pelayanan Infrastruktur & Pengaduan Warga Kota
+                  Suara Anda, Perubahan Nyata // Sistem Informasi Pelaporan Kota
                 </p>
                 <p className="text-[10px] text-slate-400 font-mono">
                   Dokumen Tanda Terima Digital Sah • Terotentikasi ISO 27001 Civic Tech

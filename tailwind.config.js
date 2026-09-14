@@ -93,12 +93,12 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Questrial', 'Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-        header: ['Agrandir', 'Space Grotesk', 'Unbounded', 'Syne', 'sans-serif'],
-        display: ['Agrandir', 'Space Grotesk', 'Unbounded', 'Syne', 'sans-serif'],
-        body: ['Questrial', 'Plus Jakarta Sans', 'sans-serif'],
-        technical: ['Space Grotesk', 'sans-serif'],
-        mono: ['IBM Plex Mono', 'monospace'],
+        sans: ['"Instrument Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        header: ['"Bricolage Grotesque"', '"Instrument Sans"', 'sans-serif'],
+        display: ['"Bricolage Grotesque"', '"Instrument Sans"', 'sans-serif'],
+        body: ['"Instrument Sans"', 'sans-serif'],
+        technical: ['"JetBrains Mono"', 'monospace'],
+        mono: ['"JetBrains Mono"', 'monospace'],
       },
       borderRadius: {
         DEFAULT: '8px',

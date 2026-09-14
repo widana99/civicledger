@@ -123,15 +123,15 @@ export function PublicMapPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link to={isAdmin ? "/app/admin" : "/"} className="flex items-center gap-2.5">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-white shadow-sm ${isAdmin ? 'bg-gradient-to-br from-[#0EA58D] to-[#E5A93C]' : 'bg-[#D4A843] text-[#0A1628]'}`}>
-                <ShieldCheck className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-white p-1 flex items-center justify-center shadow-sm">
+                <img src="/images/logo.png" alt="LaporinAja Logo" className="w-full h-full object-contain" />
               </div>
               <div>
                 <span className="font-display font-bold text-white text-base leading-none block">
-                  CivicLedger
+                  LaporinAja
                 </span>
                 <span className="text-[10px] font-mono text-[#D4A843] block uppercase tracking-widest mt-0.5">
-                  {isAdmin ? '🛡️ Tactical Command Map' : 'Peta Real-Time Kota'}
+                  {isAdmin ? 'Posko Monitoring Wilayah' : 'Peta Sebaran Laporan Warga'}
                 </span>
               </div>
             </Link>

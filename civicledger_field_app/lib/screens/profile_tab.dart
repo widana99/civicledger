@@ -505,13 +505,35 @@ class _ProfileTabState extends State<ProfileTab> {
                   ),
                   const Divider(height: 1, indent: 56),
                   ListTile(
-                    leading: const Icon(Icons.verified_user_outlined, size: 20, color: AppColors.obsidian),
+                    leading: Container(
+                      width: 32,
+                      height: 32,
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.obsidian.withValues(alpha: 0.1),
+                            blurRadius: 4,
+                          ),
+                        ],
+                        border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(5),
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
                     title: Text(
                       'Versi Aplikasi Petugas',
                       style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                     subtitle: const Text(
-                      'CivicLedger Tactical Field v2.0 (Build 2)',
+                      'LaporinAja Satgas Lapangan v2.0',
                       style: TextStyle(fontSize: 12),
                     ),
                   ),

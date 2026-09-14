@@ -45,7 +45,7 @@ export function NotFoundPage() {
 
         {/* Footer */}
         <p className="text-[10px] text-slate-400 font-mono pt-4">
-          CivicLedger — Sistem Catatan Laporan Kota
+          LaporinAja — Suara Anda, Perubahan Nyata // Sistem Laporan Kota
         </p>
       </div>
     </div>

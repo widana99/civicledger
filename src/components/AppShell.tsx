@@ -12,7 +12,7 @@ import {
   Home, FilePlus2, MapPin, BarChart3, LayoutDashboard, Users, Map as MapIcon,
   ListTodo, User, LogOut, Menu, X, ShieldCheck, ClipboardList, UserCheck, Bell,
   AlertCircle, MessageSquare, ArrowUpCircle, Settings, Loader2, BellRing, BellOff,
-  CheckCheck, Check,
+  CheckCheck, Check, Layers,
 } from 'lucide-react';
 
 interface NavItem {
@@ -36,6 +36,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/app/admin/users', label: 'Kelola Pengguna', icon: UserCheck, roles: ['admin'] },
 
   // Shared navigation
+  { to: '/reports', label: 'Semua Laporan Warga', icon: Layers, roles: ['masyarakat', 'admin'] },
   { to: '/map', label: 'Peta Real-Time', icon: MapPin, roles: ['masyarakat', 'admin'] },
   { to: '/stats', label: 'Statistik Kota', icon: BarChart3, roles: ['masyarakat', 'admin'] },
   { to: '/app/notifications', label: 'Notifikasi', icon: Bell, roles: ['masyarakat', 'admin'] },
@@ -306,14 +307,12 @@ export function AppShell() {
       {/* Brand Header */}
       <div className="px-5 py-5 border-b border-white/10 bg-[#0B132B]/80 backdrop-blur-md">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0EA58D] via-[#2DD4BF] to-[#E5A93C] p-[1.5px] shadow-glow-teal flex-shrink-0 group-hover:scale-105 transition-transform">
-            <div className="w-full h-full bg-[#080E1F] rounded-[10px] flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5 text-[#2DD4BF]" />
-            </div>
+          <div className="w-10 h-10 rounded-xl bg-white p-1 shadow-md flex-shrink-0 group-hover:scale-105 transition-transform flex items-center justify-center">
+            <img src="/images/logo.png" alt="LaporinAja Logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <div className="font-display font-extrabold text-white text-base leading-none tracking-tight">CivicLedger</div>
-            <div className="text-[10px] font-mono text-[#E5A93C] mt-1 tracking-wider uppercase font-semibold">
+            <div className="font-display font-extrabold text-white text-base leading-none tracking-tight">LaporinAja</div>
+            <div className="text-[10px] font-mono text-[#D4A843] mt-1 tracking-wider uppercase font-semibold">
               {profile.role === 'admin' ? '🛡️ Admin Hub' : '👤 Portal Warga'}
             </div>
           </div>
@@ -414,6 +413,12 @@ export function AppShell() {
             >
               <Menu className="w-5 h-5" />
             </button>
+            <div className="lg:hidden flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-white p-0.5 shadow-xs border border-slate-200 dark:border-slate-800 flex items-center justify-center">
+                <img src="/images/logo.png" alt="LaporinAja" className="w-full h-full object-contain" />
+              </div>
+              <span className="font-display font-black text-sm tracking-tight text-[#0B132B] dark:text-white">LaporinAja</span>
+            </div>
             <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
               <span className="w-2 h-2 rounded-full bg-[#0EA58D] animate-ping" />
               {profile.role === 'admin'

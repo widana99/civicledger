@@ -7,7 +7,7 @@ import { useTheme } from '../context/ThemeContext';
 import { Report } from '../types';
 import { StatusBadge, CategoryBadge } from '../components/Badges';
 import { VideoBackground } from '../components/VideoBackground';
-import { SplineScene } from '../components/SplineScene';
+import { CityTelemetry3D } from '../components/CityTelemetry3D';
 import { ThemeToggle } from '../components/ThemeToggle';
 import {
   ShieldCheck, MapPin, ArrowRight,
@@ -17,7 +17,7 @@ import {
   Radio, ArrowUpRight, CheckCircle, Users, Phone,
   Send, MessageCircle, LogOut, Sparkles,
   Box, Shield, Zap, Flame, Compass, BarChart3, PlusCircle,
-  Layers, MousePointer, RotateCw, Globe
+  Layers, MousePointer, RotateCw, Globe, Waves
 } from 'lucide-react';
 import type { Variants } from 'framer-motion';
 
@@ -40,45 +40,45 @@ const TAB_CONTENT: Record<TabKey, {
   accent: string;
 }> = {
   transparansi: {
-    index: 'SYS-01',
-    title: 'Command Center & Audit Terbuka',
-    subtitle: 'Transparansi Real-Time Publik',
-    desc: 'Setiap entri aspirasi dan keluhan warga terekam permanen dalam ledger terbuka. Dilengkapi analitik telemetri kota, histori status kronologis, dan verifikasi multi-tier yang tidak dapat dimanipulasi.',
+    index: '01 / VALIDASI',
+    title: 'Pusat Koordinasi & Validasi Terbuka',
+    subtitle: 'Transparansi Riwayat Laporan',
+    desc: 'Setiap aduan warga diverifikasi dan tercatat dengan histori status yang transparan, dapat dipantau langsung oleh pelapor maupun publik tanpa manipulasi.',
     bullets: [
-      'Audit trail kronologis setiap perubahan status laporan',
-      'Dashboard analitik kota dengan pembaruan data real-time',
-      'Verifikasi identitas berkeamanan tinggi dengan opsi mode anonim',
+      'Pencatatan kronologis setiap tahapan verifikasi dan tindak lanjut',
+      'Statistik sebaran masalah kota yang terintegrasi langsung',
+      'Verifikasi akun resmi dengan opsi pelaporan anonim demi privasi',
     ],
     image: '/images/command_center.jpg',
-    tag: 'PUBLIC AUDIT LEDGER',
+    tag: 'TRANSPARANSI STATUS',
     accent: '#0EA58D',
   },
   teknologi: {
-    index: 'SYS-02',
-    title: 'Keunggulan Geospasial AI',
-    subtitle: 'Presisi Koordinat & Heatmap AI',
-    desc: 'Memadukan koordinat GPS presisi tinggi, peta klaster interaktif, deteksi laporan ganda dalam radius 50 meter, dan radar notifikasi instan untuk akselerasi respon penanganan di lapangan.',
+    index: '02 / GEOLOKASI',
+    title: 'Akurasi Titik Lokasi & Deteksi Cerdas',
+    subtitle: 'Geotagging Presisi & Deteksi Masalah Serupa',
+    desc: 'Menentukan koordinat insiden dengan titik GPS akurat, pemetaan konsentrasi masalah, dan deteksi laporan berdekatan untuk mencegah duplikasi pengerjaan dinas.',
     bullets: [
-      'Penandaan lokasi insiden dengan akurasi GPS sub-meter',
-      'Peta klaster interaktif berbasis zona wilayah & densitas masalah',
-      'Deteksi otomatis laporan duplikat berbasis radius geolokasi',
+      'Penandaan lokasi kerusakan fasilitas dengan GPS presisi',
+      'Pengelompokan klaster wilayah berdasarkan konsentrasi laporan',
+      'Peringatan otomatis jika terdapat laporan serupa di radius terdekat',
     ],
     image: '/images/smart_city_hologram.jpg',
-    tag: '3D GEOSPATIAL RADAR',
+    tag: 'PEMETAAN GEOSPASIAL PRESISI',
     accent: '#D4A843',
   },
   profesional: {
-    index: 'SYS-03',
-    title: 'Armada Tanggap Lapangan',
-    subtitle: 'Aplikasi Mobile Petugas PWA',
-    desc: 'Sistem disposisi cerdas mengarahkan petugas dinas terkait ke titik insiden dengan navigasi peta instan, kewajiban bukti foto pengerjaan, dan evaluasi rating langsung dari warga pelapor.',
+    index: '03 / PENANGANAN',
+    title: 'Penyelesaian Langsung oleh Dinas Terkait',
+    subtitle: 'Integrasi Satuan Tugas & Dokumentasi Hasil',
+    desc: 'Laporan yang tervalidasi langsung diteruskan ke petugas dinas berwenang lengkap dengan panduan navigasi lokasi dan kewajiban unggah foto bukti pengerjaan.',
     bullets: [
-      'Aplikasi mobile khusus petugas dengan navigasi GPS terpadu',
-      'Wajib unggah bukti foto pengerjaan sebelum tiket diselesaikan',
-      'Evaluasi skor kepuasan bintang 1–5 langsung dari warga',
+      'Disposisi instan ke tim teknis dinas yang berwenang',
+      'Petugas wajib menyertakan foto dokumentasi hasil perbaikan',
+      'Warga memberikan evaluasi bintang 1–5 atas hasil pekerjaan',
     ],
     image: '/images/field_officer.jpg',
-    tag: 'FIELD RESPONSE UNIT',
+    tag: 'SATUAN TUGAS DINAS',
     accent: '#3B82F6',
   },
 };
@@ -108,6 +108,7 @@ export function LandingPage() {
   const [loadingReports, setLoadingReports] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('transparansi');
   const [selectedHeroPill, setSelectedHeroPill] = useState('all');
+  const [active3DSector, setActive3DSector] = useState<'all' | 'infrastruktur' | 'drainase' | 'penerangan' | 'kebersihan'>('all');
 
   useEffect(() => {
     const fetchPublicReports = async () => {
@@ -141,14 +142,31 @@ export function LandingPage() {
           
           {/* ───── LUXURY TOPBAR ───── */}
           <header className="px-6 sm:px-10 pt-6 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4 z-30 border-b border-slate-200 dark:border-slate-800/60 backdrop-blur-xl bg-white/80 dark:bg-[#0B1120]/75">
-            {/* Left Nav Pills */}
-            <div className="flex items-center gap-2 flex-wrap">
+            {/* Left Nav Brand & Pills */}
+            <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+              <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0 mr-1">
+                <div className="w-10 h-10 rounded-xl bg-white p-1 shadow-sm border border-slate-200/80 dark:border-slate-800 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <img src="/images/logo.png" alt="LaporinAja Logo" className="w-full h-full object-contain" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-header font-black text-base tracking-tight text-slate-900 dark:text-white leading-none">LaporinAja</span>
+                  <span className="text-[9px] font-mono font-bold text-[#D4A843] tracking-wider uppercase leading-none mt-0.5">Suara Anda, Perubahan Nyata</span>
+                </div>
+              </Link>
+
               <Link
                 to="/"
                 className="px-4 py-1.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-[#0B1120] text-xs font-bold tracking-wide shadow-sm hover:opacity-90 transition-all flex items-center gap-1.5 font-header"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-[#0EA58D]" />
                 Beranda
+              </Link>
+              <Link
+                to="/reports"
+                className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center gap-1.5 border border-slate-200 dark:border-white/5 font-body"
+              >
+                <FileText className="w-3 h-3 text-[#D4A843]" />
+                Daftar Laporan
               </Link>
               <Link
                 to="/map"
@@ -205,16 +223,16 @@ export function LandingPage() {
           </header>
 
           {/* ───── 3-COLUMN EDITORIAL TELEMETRY BAR ───── */}
-          <div className="px-6 sm:px-10 pt-4 pb-2 grid grid-cols-1 md:grid-cols-3 gap-6 text-[11px] text-slate-500 dark:text-slate-400 font-mono border-b border-slate-200 dark:border-slate-800/40 z-20">
+          <div className="px-6 sm:px-10 pt-4 pb-3 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-600 dark:text-slate-400 font-medium border-b border-slate-200 dark:border-slate-800/40 z-20">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#0EA58D] animate-ping" />
-              <span className="text-slate-800 dark:text-slate-200 font-semibold uppercase tracking-wider">CIVIC INFRASTRUCTURE LEDGER</span>
+              <span className="text-slate-900 dark:text-white font-semibold">Sistem Laporan Lingkungan & Fasilitas Kota</span>
             </div>
-            <div className="md:text-center font-medium">
-              // TELEMETRI KOTA AKTIF: 100% AUDIT TERBUKA //
+            <div className="md:text-center text-slate-700 dark:text-slate-300">
+              Transparansi Riwayat & Monitoring Publik
             </div>
-            <div className="md:text-right">
-              <span className="text-[#D4A843] font-bold">RESPON CEPAT SLA:</span> 1–3 HARI KERJA
+            <div className="md:text-right font-mono text-[11px]">
+              <span className="text-[#D4A843] font-bold">Target Penanganan:</span> 1–3 Hari Kerja
             </div>
           </div>
 
@@ -231,15 +249,15 @@ export function LandingPage() {
                 showControls={true}
               />
 
-              {/* ───── GIANT 'CIVIC' TITLE WATERMARK ───── */}
+              {/* ───── GIANT 'LAPORINAJA' TITLE WATERMARK ───── */}
               <div className="absolute top-2 sm:top-6 lg:top-8 inset-x-0 flex justify-center items-start pointer-events-none select-none z-10">
                 <motion.h1
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-                  className="font-header font-black text-[17vw] lg:text-[18.5vw] leading-[0.82] tracking-[-0.04em] text-white/[0.12] uppercase text-center"
+                  className="font-header font-black text-[11vw] lg:text-[12.5vw] leading-[0.82] tracking-[-0.04em] text-white/[0.12] uppercase text-center"
                 >
-                  CIVIC
+                  LAPORINAJA
                 </motion.h1>
               </div>
 
@@ -251,9 +269,9 @@ export function LandingPage() {
                   variants={fadeInUp}
                   className="space-y-5"
                 >
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900/90 border border-slate-700/80 backdrop-blur-md text-[11px] font-mono text-emerald-400 shadow-sm">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900/90 border border-slate-700/80 backdrop-blur-md text-xs font-medium text-emerald-400 shadow-sm">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>SMART CITY INFRASTRUCTURE & ENVIRONMENT LEDGER</span>
+                    <span>Sistem Terbuka Partisipasi & Pengawasan Fasilitas Kota</span>
                   </div>
 
                   <h2 className="font-header font-extrabold text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight uppercase leading-[1.08]">
@@ -264,7 +282,7 @@ export function LandingPage() {
                   </h2>
 
                   <p className="font-body text-sm sm:text-base text-slate-200 max-w-2xl leading-relaxed">
-                    Platform pengaduan fasilitas umum, jalan berlubang, sampah, dan lingkungan terintegrasi dengan peta radar geospasial, SLA akuntabel, dan aplikasi petugas lapangan.
+                    Platform partisipasi warga untuk melaporkan kerusakan fasilitas umum, kebersihan lingkungan, dan memantau respon langsung petugas lapangan secara transparan.
                   </p>
 
                   {/* Call To Actions */}
@@ -282,7 +300,7 @@ export function LandingPage() {
                       className="px-6 py-3.5 rounded-full bg-slate-900/90 hover:bg-slate-800 text-white text-xs font-bold font-header uppercase tracking-wider border border-slate-700 backdrop-blur-md transition-all flex items-center gap-2"
                     >
                       <Radio className="w-4 h-4 text-[#D4A843]" />
-                      <span>Eksplorasi Peta Radar</span>
+                      <span>Buka Peta Sebaran Masalah</span>
                     </Link>
                   </div>
                 </motion.div>
@@ -334,15 +352,15 @@ export function LandingPage() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-mono text-xs font-bold uppercase tracking-widest">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-bold uppercase tracking-widest">
               <Box className="w-3.5 h-3.5" />
-              <span>3D WEBGL INTERACTIVE CANVAS</span>
+              <span>THREE.JS & THREEUI DIGITAL TWIN ENGINE</span>
             </div>
             <h2 className="font-header font-extrabold text-3xl sm:text-5xl text-slate-900 dark:text-white tracking-tight uppercase">
-              Digital Twin Kota Cerdas
+              Digital Twin & Telemetri Kota
             </h2>
             <p className="font-body text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-              Model 3D interaktif real-time yang memvisualisasikan zonasi infrastruktur perkotaan. Geser, putar, dan eksplorasi simpul telemetri fasilitas publik secara langsung.
+              Model 3D interaktif real-time yang memvisualisasikan klaster laporan fasilitas publik, sensor lingkungan, dan zonasi perkotaan. Geser, putar, dan inspeksi simpul telemetri insiden secara langsung.
             </p>
           </div>
 
@@ -353,57 +371,87 @@ export function LandingPage() {
           </div>
         </div>
 
-        {/* 3D WebGL Spline Theater Showcase */}
+        {/* 3D WebGL ThreeUI Theater Showcase */}
         <div className="grid lg:grid-cols-12 gap-8 items-center">
           
           {/* Main 3D Canvas Box */}
-          <div className="lg:col-span-8 h-[480px] sm:h-[580px] rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 bg-[#070A11] relative">
-            <SplineScene
-              sceneUrl="https://prod.spline.design/hyEpCSgFwD6XVbdZ/scene.splinecode"
+          <div className="lg:col-span-8 h-[500px] sm:h-[620px] rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 bg-[#070A11] relative">
+            <CityTelemetry3D
+              activeExternalSector={active3DSector}
               className="w-full h-full"
             />
           </div>
 
-          {/* Side Telemetry Cards */}
+          {/* Side Telemetry Cards (Interactive Sector Controls) */}
           <div className="lg:col-span-4 space-y-4">
             
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-lg space-y-3">
+            <div
+              onClick={() => setActive3DSector(active3DSector === 'infrastruktur' ? 'all' : 'infrastruktur')}
+              className={`p-6 rounded-2xl bg-white dark:bg-[#0B1120] border shadow-lg space-y-3 cursor-pointer transition-all duration-300 hover:-translate-y-1 ${
+                active3DSector === 'infrastruktur'
+                  ? 'border-rose-500 ring-2 ring-rose-500/20 bg-rose-500/5'
+                  : 'border-slate-200 dark:border-slate-800 hover:border-rose-500/50'
+              }`}
+            >
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs text-[#0EA58D] font-bold">[ SIMPUL SENSOR ]</span>
-                <Globe className="w-4 h-4 text-slate-400" />
+                <span className="font-mono text-xs text-rose-500 font-bold">[ SEKTOR BINA MARGA ]</span>
+                <Wrench className="w-4 h-4 text-rose-400" />
               </div>
               <h3 className="font-header font-bold text-lg text-slate-900 dark:text-white uppercase">
-                Geotagging Presisi Tinggi
+                Jalan & Koridor Aspal
               </h3>
               <p className="font-body text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Setiap laporan otomatis ditautkan ke titik koordinat satelit dengan radius klastering otomatis.
+                Inspeksi titik jalan berlubang, amblas, dan kerusakan trotoar ramah disabilitas. Klik untuk memfilter simpul jalan pada model 3D.
               </p>
+              <div className="pt-2 flex items-center gap-1 text-xs font-mono font-bold text-rose-500">
+                <span>{active3DSector === 'infrastruktur' ? '✓ Filter Aktif' : 'Aktifkan Sorotan Sektor Jalan →'}</span>
+              </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-lg space-y-3">
+            <div
+              onClick={() => setActive3DSector(active3DSector === 'drainase' ? 'all' : 'drainase')}
+              className={`p-6 rounded-2xl bg-white dark:bg-[#0B1120] border shadow-lg space-y-3 cursor-pointer transition-all duration-300 hover:-translate-y-1 ${
+                active3DSector === 'drainase'
+                  ? 'border-[#0EA58D] ring-2 ring-[#0EA58D]/20 bg-[#0EA58D]/5'
+                  : 'border-slate-200 dark:border-slate-800 hover:border-[#0EA58D]/50'
+              }`}
+            >
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs text-[#D4A843] font-bold">[ DISPOSISI TIKET ]</span>
-                <Zap className="w-4 h-4 text-slate-400" />
+                <span className="font-mono text-xs text-[#0EA58D] font-bold">[ SEKTOR TATA AIR & BANJIR ]</span>
+                <Waves className="w-4 h-4 text-[#0EA58D]" />
               </div>
               <h3 className="font-header font-bold text-lg text-slate-900 dark:text-white uppercase">
-                Respon Cepat Lapangan
+                Mitigasi Banjir & Kanal Sungai
               </h3>
               <p className="font-body text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Penugasan otomatis ke petugas zona wilayah dengan notifikasi push Firebase dan SLA terukur.
+                Pemantauan tinggi muka air sungai, sensor luapan tanggul, dan status operasional pintu air kota secara real-time.
               </p>
+              <div className="pt-2 flex items-center gap-1 text-xs font-mono font-bold text-[#0EA58D]">
+                <span>{active3DSector === 'drainase' ? '✓ Filter Aktif' : 'Aktifkan Sorotan Sektor Sungai →'}</span>
+              </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-lg space-y-3">
+            <div
+              onClick={() => setActive3DSector(active3DSector === 'penerangan' ? 'all' : 'penerangan')}
+              className={`p-6 rounded-2xl bg-white dark:bg-[#0B1120] border shadow-lg space-y-3 cursor-pointer transition-all duration-300 hover:-translate-y-1 ${
+                active3DSector === 'penerangan'
+                  ? 'border-[#D4A843] ring-2 ring-[#D4A843]/20 bg-[#D4A843]/5'
+                  : 'border-slate-200 dark:border-slate-800 hover:border-[#D4A843]/50'
+              }`}
+            >
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs text-blue-500 font-bold">[ PRIVASI WARGA ]</span>
-                <Shield className="w-4 h-4 text-slate-400" />
+                <span className="font-mono text-xs text-[#D4A843] font-bold">[ SEKTOR FASILITAS & PJU ]</span>
+                <Zap className="w-4 h-4 text-[#D4A843]" />
               </div>
               <h3 className="font-header font-bold text-lg text-slate-900 dark:text-white uppercase">
-                Mode Anonim Terlindungi
+                Penerangan Jalan & Transit
               </h3>
               <p className="font-body text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Warga dapat melapor tanpa mengekspos identitas pribadi ke publik, tetap aman dan terlindungi.
+                Deteksi lampu PJU padam, rambu lalu lintas rusak, serta integrasi koridor transportasi publik LRT dan halte terpadu.
               </p>
+              <div className="pt-2 flex items-center gap-1 text-xs font-mono font-bold text-[#D4A843]">
+                <span>{active3DSector === 'penerangan' ? '✓ Filter Aktif' : 'Aktifkan Sorotan Sektor PJU →'}</span>
+              </div>
             </div>
 
           </div>
@@ -520,9 +568,9 @@ export function LandingPage() {
         {/* 3 Metric Cards */}
         <div className="grid sm:grid-cols-3 gap-6">
           {[
-            { code: 'MET-01', value: '100%', label: 'Audit Publik Terbuka', desc: 'Setiap laporan tersimpan dalam buku besar terbuka dan tidak dapat dimanipulasi.', icon: Eye, color: 'text-emerald-500 dark:text-emerald-400' },
-            { code: 'MET-02', value: '< 24H', label: 'Rata-rata Respon Tim', desc: 'Petugas lapangan ditugaskan langsung dengan SLA respon terukur.', icon: Clock, color: 'text-amber-500 dark:text-amber-400' },
-            { code: 'MET-03', value: 'GEOTAG', label: 'Akurasi Koordinat GPS', desc: 'Lokasi otomatis terpetakan untuk akurasi pengerjaan armada di lapangan.', icon: MapPin, color: 'text-blue-500 dark:text-blue-400' },
+            { code: '01', value: '100%', label: 'Audit Publik Terbuka', desc: 'Setiap laporan tersimpan dalam sistem terbuka dan tidak dapat dimanipulasi.', icon: Eye, color: 'text-emerald-500 dark:text-emerald-400' },
+            { code: '02', value: '< 24 Jam', label: 'Rata-rata Respon Tim', desc: 'Petugas lapangan ditugaskan langsung dengan target waktu terukur.', icon: Clock, color: 'text-amber-500 dark:text-amber-400' },
+            { code: '03', value: 'Geotag', label: 'Akurasi Koordinat GPS', desc: 'Lokasi otomatis terpetakan untuk akurasi pengerjaan armada di lapangan.', icon: MapPin, color: 'text-blue-500 dark:text-blue-400' },
           ].map((stat) => {
             const Icon = stat.icon;
             return (
@@ -550,8 +598,8 @@ export function LandingPage() {
             {/* Left Narrative */}
             <div className="lg:col-span-6 space-y-8">
               <div>
-                <span className="px-3.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-mono font-bold uppercase tracking-[0.2em] border border-emerald-500/30">
-                  // ALUR 4 TAHAPAN //
+                <span className="px-3.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold uppercase tracking-wider border border-emerald-500/30">
+                  Alur Penanganan Transparan
                 </span>
                 <h2 className="font-header text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mt-4 leading-tight uppercase tracking-tight">
                   Dari Laporan Hingga Selesai Tuntas
@@ -565,7 +613,7 @@ export function LandingPage() {
               <div className="space-y-4">
                 {[
                   { step: '01', title: 'Warga Mengirim Laporan', desc: 'Isi formulir ringkas, unggah foto kondisi, dan aktifkan GPS untuk tagging lokasi presisi dengan opsi anonim.' },
-                  { step: '02', title: 'Verifikasi & Skala Prioritas', desc: 'Admin sistem memvalidasi laporan dan menetapkan prioritas pengerjaan (Darurat / Normal / SLA).' },
+                  { step: '02', title: 'Verifikasi & Skala Prioritas', desc: 'Admin sistem memvalidasi laporan dan menetapkan prioritas pengerjaan (Darurat / Normal / Standar).' },
                   { step: '03', title: 'Petugas Dikerahkan ke Lapangan', desc: 'Armada teknis dinas terkait menerima rincian tugas di aplikasi mobile dan bergerak menindaklanjuti.' },
                   { step: '04', title: 'Selesai dengan Bukti & Rating', desc: 'Petugas mengunggah foto penyelesaian; warga pelapor memberikan rating kepuasan.' },
                 ].map((item) => (
@@ -592,8 +640,8 @@ export function LandingPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
                 <div className="absolute bottom-5 left-5 right-5 text-white">
-                  <div className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-widest">[ UNIT RESPON LAPANGAN ]</div>
-                  <div className="text-lg font-extrabold font-header uppercase tracking-tight mt-0.5">Petugas Bersertifikasi & Siaga 24/7</div>
+                  <div className="text-xs font-mono text-emerald-400 font-bold uppercase tracking-wider">Satuan Tugas Lapangan Terpadu</div>
+                  <div className="text-lg font-extrabold font-header uppercase tracking-tight mt-0.5">Petugas Teknis Siaga Penanganan</div>
                 </div>
               </div>
 
@@ -606,7 +654,7 @@ export function LandingPage() {
                   />
                   <div className="absolute inset-0 bg-slate-950/50" />
                   <div className="absolute bottom-3 left-3 text-white text-xs font-bold font-header uppercase tracking-wider">
-                    [ DASHBOARD ANALITIK ]
+                    Monitoring Wilayah Terpadu
                   </div>
                 </div>
                 
@@ -618,7 +666,7 @@ export function LandingPage() {
                   />
                   <div className="absolute inset-0 bg-slate-950/50" />
                   <div className="absolute bottom-3 left-3 text-white text-xs font-bold font-header uppercase tracking-wider">
-                    [ 4 PILAR KEAMANAN ]
+                    Keamanan & Validasi Berlapis
                   </div>
                 </div>
               </div>
@@ -632,20 +680,29 @@ export function LandingPage() {
       <section className="py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto space-y-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
           <div>
-            <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-[0.2em] mb-2 block">
-              // LIVE STREAM //
+            <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider mb-2 block">
+              Aspirasi Terkini Warga
             </span>
             <h2 className="font-header text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
               Laporan Masuk Warga Kota
             </h2>
           </div>
-          <Link
-            to="/map"
-            className="px-5 py-2.5 rounded-full bg-[#0EA58D] hover:bg-[#0c8b77] text-xs font-bold font-header text-white transition-all flex items-center gap-2 self-start uppercase tracking-wider shadow-md"
-          >
-            <span>Buka Peta Interaktif</span>
-            <ChevronRight className="w-4 h-4" />
-          </Link>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <Link
+              to="/reports"
+              className="px-5 py-2.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-slate-100 text-xs font-bold font-header transition-all flex items-center gap-2 self-start uppercase tracking-wider shadow-md"
+            >
+              <span>Semua Laporan Warga</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            <Link
+              to="/map"
+              className="px-5 py-2.5 rounded-full bg-[#0EA58D] hover:bg-[#0c8b77] text-xs font-bold font-header text-white transition-all flex items-center gap-2 self-start uppercase tracking-wider shadow-md"
+            >
+              <span>Buka Peta Interaktif</span>
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
 
         {loadingReports ? (
@@ -719,6 +776,29 @@ export function LandingPage() {
             })}
           </div>
         )}
+
+        {/* Full-width callout to Explore All Citizen Reports */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-slate-900 text-white border border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+          <div className="space-y-2 text-center md:text-left z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4A843]/15 text-[#D4A843] border border-[#D4A843]/30 text-xs font-mono font-bold uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5" />
+              Direktori Komunitas Publik
+            </div>
+            <h3 className="font-header font-black text-xl sm:text-2xl uppercase tracking-tight">
+              Ingin Melihat Seluruh Pengaduan Warga Kota?
+            </h3>
+            <p className="font-body text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+              Jelajahi ratusan laporan infrastruktur, kebersihan, dan fasilitas publik dengan fitur pencarian instan, filter kategori, status SLA penanganan, serta deteksi radius lokasi GPS terdekat Anda.
+            </p>
+          </div>
+          <Link
+            to="/reports"
+            className="px-7 py-3.5 rounded-full bg-[#D4A843] hover:bg-[#c29636] text-slate-950 font-header font-black text-xs uppercase tracking-wider transition-all flex items-center gap-2 flex-shrink-0 shadow-lg hover:scale-105 z-10"
+          >
+            <span>Buka Direktori Lengkap</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </section>
 
       {/* ═══════ 6. SECTION: 6 PILAR LAYANAN BENTO GRID ═══════ */}
@@ -726,8 +806,8 @@ export function LandingPage() {
         <div className="grid lg:grid-cols-12 gap-12 items-start">
           
           <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
-            <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-[0.2em] block">
-              [ 6 PILAR LAYANAN ]
+            <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider block">
+              Standar & Komitmen Penanganan
             </span>
             <h2 className="font-header text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white leading-tight uppercase tracking-tight">
               Standar Layanan Publik.
@@ -777,19 +857,23 @@ export function LandingPage() {
             
             <div className="lg:col-span-5 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-white text-slate-950 flex items-center justify-center font-black">
-                  <ShieldCheck className="w-5 h-5 text-[#0EA58D]" />
+                <div className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-md">
+                  <img src="/images/logo.png" alt="LaporinAja Logo" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-header font-black text-xl text-white tracking-tight uppercase">CIVICLEDGER</span>
+                <div>
+                  <span className="font-header font-black text-xl text-white tracking-tight uppercase">LAPORINAJA</span>
+                  <div className="text-[10px] font-mono text-[#D4A843] uppercase tracking-wider font-semibold">Suara Anda, Perubahan Nyata</div>
+                </div>
               </div>
               <p className="font-body text-xs text-slate-400 leading-relaxed max-w-sm font-normal">
-                Sistem Informasi & Manajemen Pelaporan Fasilitas Kota Berbasis Real-Time & Geospasial untuk Pemerintah Daerah dan Masyarakat.
+                Platform Resmi Aspirasi & Pelaporan Kerusakan Fasilitas Kota Berbasis Real-Time Geospasial untuk Pemerintah Daerah dan Partisipasi Masyarakat.
               </p>
             </div>
 
             <div className="lg:col-span-3 space-y-3">
               <h4 className="font-header font-extrabold text-sm text-white uppercase tracking-wider">Akses Cepat</h4>
               <ul className="space-y-2 text-xs font-body text-slate-400">
+                <li><Link to="/reports" className="hover:text-white transition-colors">Semua Laporan Warga</Link></li>
                 <li><Link to="/map" className="hover:text-white transition-colors">Peta Real-Time Live</Link></li>
                 <li><Link to="/auth" className="hover:text-white transition-colors">Portal Masuk / Daftar</Link></li>
                 <li><Link to="/app" className="hover:text-white transition-colors">Dashboard Warga</Link></li>
@@ -807,7 +891,7 @@ export function LandingPage() {
           </div>
 
           <div className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] font-mono text-slate-500 uppercase tracking-wider">
-            <span>© {new Date().getFullYear()} CIVICLEDGER // SMART CITY INITIATIVE</span>
+            <span>© {new Date().getFullYear()} LAPORINAJA // SMART CITY INITIATIVE</span>
             <span>DESIGN INSPIRED BY ARCHITECTURAL GRAPHIC EXCELLENCE</span>
           </div>
         </div>

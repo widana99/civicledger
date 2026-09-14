@@ -51,34 +51,43 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 80,
-              height: 80,
+              width: 92,
+              height: 92,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.08),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
-              child: const Icon(
-                Icons.shield_rounded,
-                color: AppColors.emerald,
-                size: 42,
+              padding: const EdgeInsets.all(10),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             const SizedBox(height: 24),
             Text(
-              'CIVICLEDGER',
+              'LAPORINAJA',
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 24,
                 fontWeight: FontWeight.w900,
-                letterSpacing: 2.5,
+                letterSpacing: 3.0,
                 color: Colors.white,
               ),
             ),
             const SizedBox(height: 6),
             Text(
-              'Sistem Respon Petugas Lapangan',
+              'Suara Anda, Perubahan Nyata // Satgas Lapangan',
               style: GoogleFonts.plusJakartaSans(
-                fontSize: 13,
+                fontSize: 12.5,
                 color: Colors.white70,
                 letterSpacing: 0.5,
               ),

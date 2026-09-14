@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { MediaGallery } from './MediaGallery';
+import { CivicBadge3D } from '../CivicBadge3D';
 
 interface PublicReportViewProps {
   report: Report;
@@ -166,18 +167,47 @@ export function PublicReportView({
           </p>
         </div>
 
-        {/* Privacy sanitized info bar */}
-        <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 font-mono">
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-emerald-600" />
-            <span>Pelapor: <strong className="text-slate-800">{report.is_anonymous ? 'Warga Terverifikasi (Anonim)' : 'Warga Terverifikasi'}</strong> (Identitas disanitasi demi privasi)</span>
-          </div>
-          {wilayah && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-slate-400">Wilayah:</span>
-              <strong className="text-slate-800 bg-slate-100 px-2 py-0.5 rounded">{wilayah.name}</strong>
+        {/* Civic Verification & 3D Holographic Credentials Bar */}
+        <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <CivicBadge3D
+              badgeType={report.is_anonymous ? 'terverifikasi' : 'warga_teladan'}
+              size="sm"
+              interactive={true}
+              showLabel={false}
+            />
+            <div>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
+                <span>{report.is_anonymous ? 'Warga Terverifikasi (Anonim)' : (reporter?.full_name || 'Warga Terverifikasi')}</span>
+                <span className="text-[10px] font-mono font-normal px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                  {report.is_anonymous ? 'Tier II • Zamrud' : 'Tier III • Emas'}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                Kredensial 3D tervalidasi • Klik lencana untuk inspeksi ledger SHA-256
+              </p>
             </div>
-          )}
+          </div>
+
+          {assignedPetugas ? (
+            <div className="flex items-center gap-3 bg-amber-50/70 px-3.5 py-2 rounded-2xl border border-amber-200/80">
+              <CivicBadge3D
+                badgeType="petugas_siaga"
+                size="sm"
+                interactive={true}
+                showLabel={false}
+              />
+              <div>
+                <span className="text-[10px] font-mono uppercase text-amber-700 font-bold block">Petugas Penanganan</span>
+                <span className="text-xs font-bold text-slate-900 block">{assignedPetugas.full_name}</span>
+              </div>
+            </div>
+          ) : wilayah ? (
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
+              <span className="text-slate-400">Wilayah:</span>
+              <strong className="text-slate-800 bg-slate-100 px-2 py-1 rounded-lg border border-slate-200/60">{wilayah.name}</strong>
+            </div>
+          ) : null}
         </div>
       </div>
 

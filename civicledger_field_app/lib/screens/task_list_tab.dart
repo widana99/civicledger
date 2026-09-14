@@ -103,20 +103,44 @@ class _TaskListTabState extends State<TaskListTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 14.0, top: 8.0, bottom: 8.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.obsidian.withValues(alpha: 0.1),
+                  blurRadius: 6,
+                ),
+              ],
+              border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+            ),
+            padding: const EdgeInsets.all(3),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                'assets/images/logo.png',
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Tugas Lapangan',
+              'LaporinAja // Lapangan',
               style: GoogleFonts.spaceGrotesk(
                 fontWeight: FontWeight.w800,
-                fontSize: 20,
+                fontSize: 18,
               ),
             ),
             Text(
               'Daftar penugasan dari Admin & Dinas',
               style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
+                fontSize: 11.5,
                 color: AppColors.textMuted,
               ),
             ),

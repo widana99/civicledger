@@ -10,6 +10,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage').then(m => ({ defaul
 const AuthPage = lazy(() => import('./pages/AuthPage').then(m => ({ default: m.AuthPage })));
 const PublicMapPage = lazy(() => import('./pages/PublicMapPage').then(m => ({ default: m.PublicMapPage })));
 const PublicStatsPage = lazy(() => import('./pages/PublicStatsPage').then(m => ({ default: m.PublicStatsPage })));
+const PublicReportsPage = lazy(() => import('./pages/PublicReportsPage').then(m => ({ default: m.PublicReportsPage })));
 const ReportDetailPage = lazy(() => import('./pages/ReportDetailPage').then(m => ({ default: m.ReportDetailPage })));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
@@ -137,6 +138,7 @@ function AppRoutes() {
         <Route path="/auth" element={session ? <Navigate to="/" replace /> : <AuthPage />} />
         <Route path="/map" element={<PublicMapPage />} />
         <Route path="/stats" element={<PublicStatsPage />} />
+        <Route path="/reports" element={<PublicReportsPage />} />
         <Route path="/reports/:id" element={<ReportDetailPage />} />
 
         <Route
